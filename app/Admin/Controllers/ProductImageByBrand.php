@@ -10,7 +10,7 @@ namespace terre\Admin\Controllers;
 use Folklore\Image\Facades\Image;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Imagine\Image\Box;

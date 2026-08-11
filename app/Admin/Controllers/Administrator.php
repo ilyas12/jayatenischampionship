@@ -9,7 +9,7 @@ namespace terre\Admin\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use terre\Admin\Models\AdministratorModel;
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 
 class Administrator extends ScaffoldController {
     function __construct(){

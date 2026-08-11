@@ -7,7 +7,7 @@
  */
 namespace terre\Admin\Controllers;
 
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use terre\Admin\Models\CategoryModel;
 use terre\Admin\Models\SubCategoryModel;
 use terre\Systems\Controllers\Systems;

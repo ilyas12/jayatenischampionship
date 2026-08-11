@@ -1,7 +1,7 @@
 <?php namespace terre\Admin\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use terre\Admin\Models\AdministratorModel;

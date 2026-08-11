@@ -2,7 +2,7 @@
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use terre\Http\Models\ProductByCategoryModel;
 use terre\Http\Models\ProjectsModel;
 use terre\Http\Requests;

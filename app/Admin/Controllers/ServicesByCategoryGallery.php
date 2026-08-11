@@ -2,7 +2,7 @@
 
 namespace terre\Admin\Controllers;
 
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use terre\Admin\Models\GalleriesByCategoryModel;
 use terre\Admin\Models\ServicesByCategoryGalleryModel;
 use terre\Admin\Models\ServicesByCategoryModel;

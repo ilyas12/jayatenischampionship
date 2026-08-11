@@ -3,7 +3,7 @@ namespace terre\Admin\Controllers;
 
 use Folklore\Image\Facades\Image;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\FacadesInput;
 use Illuminate\Support\Facades\URL;

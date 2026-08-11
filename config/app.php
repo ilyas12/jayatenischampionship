@@ -212,7 +212,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'Input' => Illuminate\Support\Facades\Input::class,
+        'Input' => terre\Libraries\Input::class,
 
 
         'Form' => terre\Libraries\Html\FormBuilder::class,

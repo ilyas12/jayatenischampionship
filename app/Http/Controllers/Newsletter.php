@@ -1,7 +1,7 @@
 <?php namespace terre\Http\Controllers;
 
 
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use Illuminate\Support\Facades\Validator;
 use terre\Http\Models\NewsletterModel;
 

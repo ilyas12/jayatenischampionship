@@ -7,7 +7,7 @@
  */
 namespace terre\Admin\Controllers;
 
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use Illuminate\Support\Facades\URL;
 use terre\Admin\Models\PressAlbumModel;
 use terre\Admin\Models\PressModel;

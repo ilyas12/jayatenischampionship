@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use terre\Admin\Models\ConfigModel;
-use Illuminate\Support\Facades\Input;
+use terre\Libraries\Input;
 use terre\Libraries\Alert;
 use DB;
 
@@ -330,7 +330,7 @@ class Setting extends AdminController {
                 if(Input::hasfile($list->name)){
                     File::delete('resources/assets/uploads/download/'.$list->value);
                     $file           = Input::file($list->name);
-                    $filename       = str_random(5).'_'.$file->getClientOriginalName();
+                    $filename       = \Illuminate\Support\Str::random(5).'_'.$file->getClientOriginalName();
                     $file->move('resources/assets/uploads/download/', $filename);
                     $update			= ConfigModel::find($list->id);
                     $update->value	= $filename;
@@ -355,7 +355,7 @@ class Setting extends AdminController {
                 if(Input::hasfile($list->name)){
                     File::delete('resources/assets/images/'.$list->value);
                     $file           = Input::file($list->name);
-                    $filename       = str_random(5).'_'.$file->getClientOriginalName();
+                    $filename       = \Illuminate\Support\Str::random(5).'_'.$file->getClientOriginalName();
                     $file->move('resources/assets/images/', $filename);
                     $update			= ConfigModel::find($list->id);
                     $update->value	= $filename;
