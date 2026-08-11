@@ -12,7 +12,12 @@ use Carbon\Carbon;
 
 class NewsEventsModel extends Model {
     protected $table    = 'news_events';
-    protected $dates    = ['events_date','start_date','end_date'];
+    // Laravel 11 drops $dates in favour of $casts.
+    protected $casts    = [
+        'events_date' => 'datetime',
+        'start_date'  => 'datetime',
+        'end_date'    => 'datetime',
+    ];
 
     public function getEventsDateAttribute($data) {
         if($data == '0000-00-00') return '0000-00-00';
