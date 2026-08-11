@@ -1,0 +1,9 @@
+.git
+.DS_Store
+.cagefs
+.cagefs.zip
+.cl.selector
+node_modules
+storage/logs/*.log
+error_log
+**/error_log

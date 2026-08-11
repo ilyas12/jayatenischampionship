@@ -1,0 +1,65 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # php:7.1-apache is published for linux/amd64 only; on Apple Silicon this
+    # runs under emulation.
+    platform: linux/amd64
+    ports:
+      # DOCKER_-prefixed so Compose's automatic read of the Laravel .env in this
+      # directory cannot collide with these (that .env defines DB_PORT=3306).
+      - "${DOCKER_APP_PORT:-8088}:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      # Laravel 5.4 loads .env.<APP_ENV> when APP_ENV is set in the real
+      # environment, so the production .env on disk is left untouched.
+      APP_ENV: docker
+      DB_HOST: db
+      DB_DATABASE: cms_template_engine
+      DB_USERNAME: cms
+      DB_PASSWORD: secret
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.6
+    ports:
+      - "${DOCKER_DB_PORT:-33061}:3306"
+    environment:
+      MARIADB_DATABASE: cms_template_engine
+      MARIADB_USER: cms
+      MARIADB_PASSWORD: secret
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/app.cnf:ro
+      # Imported once, on first boot with an empty volume.
+      - ./cms-template-engine.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    ports:
+      - "${DOCKER_PMA_PORT:-8089}:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: cms
+      PMA_PASSWORD: secret
+      UPLOAD_LIMIT: 256M
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db-data:

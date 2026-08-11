@@ -1,0 +1,115 @@
+
+input:-webkit-autofill {
+-webkit-box-shadow: 0 0 0px 1000px white inset;
+}
+INPUT {
+font: 13px Tahoma, Verdana, sans-serif; 
+}
+BODY {
+font-family: "Segoe UI",Ubuntu,"lucida grande",tahoma,sans-serif;
+font-size: 12px;
+text-align: center; 
+background: url(img/background.png) repeat 0 0;
+}
+BODY, HTML {
+height: 100%; 
+}
+#x_cfn {
+margin: 0 auto 0 auto; 
+width: 304px;
+}
+#x_cfo {
+height: 23%; 
+}
+#x_cfp {
+padding-top: 0;    
+padding-bottom: 0;
+background: url(img/middle.png) repeat-y -0px 0px;
+}
+#x_cfp TABLE {
+text-align: left;   
+margin-bottom: 0px; 
+padding: 0px;       
+}
+#logoField {
+padding-bottom: 25px;
+}
+#x_cfq,
+#x_cfr {
+width: 252px;    
+font-size: 16px;
+margin-top: 2px; 
+margin-bottom: 1px;
+padding: 2px 5px;
+}
+#x_cfr {
+margin-bottom: 10px; 
+}
+#x_cfs {
+text-align: center;
+padding-top: 15px; 
+}
+#x_cfs A {
+color: gray;
+text-decoration: none;
+font-size: 1px;
+}
+#x_cfq,
+#x_cfr,
+#x_cft {
+height: 30px;
+width: 252px;
+border: 1px solid lightgray;
+border-radius: 3px;
+}
+#x_cft {
+background-color: #02a0e0;
+cursor: pointer;
+color: white;
+font-weight: bold;
+border-color: darkslategrey;
+margin-bottom: 20px;
+height: 35px;
+-webkit-appearance: none;
+}
+.x_cfu {
+padding-top: 7px; 
+}
+.x_cfu, LABEL {
+font-size: 13px;
+}
+#x_cfv {
+width: 252px;
+margin-bottom: 5px;
+color: red;
+font-size: 13px; 
+}
+#x_cfv TD {
+padding-top: 1px; 
+padding-right: 2px; 
+}
+#x_cfw {
+position: relative;
+top: -3px; 
+}
+.x_89y #x_cfo {
+height: 14px; 
+}
+.x_89y #logoField {
+padding-bottom: 10px;
+}
+.x_89y #x_cfs A {
+font-size: 16px; 
+}
+#x_cfx {
+vertical-align: top;
+}
+UL {
+padding-left: 16px; 
+}
+.msie7 #x_cfy {
+margin-top: 1px; 
+}
+.msie7 #x_cfz {
+margin-top: -1px; 
+}

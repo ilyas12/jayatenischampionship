@@ -1,0 +1,17 @@
+BODY {
+color: gray;
+margin: 0; 
+}
+IMG {
+vertical-align: middle; 
+}
+
+x_cfn {
+width: 240px; 
+margin: auto;
+}
+#x_cfq,
+#x_cfr {
+	width: 210px;
+	text-decoration:none;
+}

@@ -1,0 +1,30 @@
+# Composer manages this; composer.lock pins the exact versions. A baseline
+# tarball of the Laravel 5.4 vendor tree is kept in .backup/ as a rollback
+# artifact for the upgrade.
+/vendor
+/node_modules
+/.backup
+
+# Real credentials — never commit. .env.docker holds the throwaway container
+# config and IS tracked.
+.env
+
+# CloudLinux / cPanel leftovers from the original shared host.
+.cagefs/
+.cagefs.zip
+.cl.selector/
+
+.DS_Store
+error_log
+**/error_log
+npm-debug.log
+yarn-error.log
+
+/storage/*.key
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/**/.gitkeep
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
