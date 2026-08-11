@@ -21,9 +21,9 @@
                             </a>
                         </div>
                         @if ( $main_newsandevent->period_time == 1 )
-                        <div class="date-news">{{ date('d F Y', strtotime($main_newsandevent->start_date)) }} - {{ date('d F Y', strtotime($main_newsandevent->end_date)) }}</div>
+                        <div class="date-news">{{ $main_newsandevent->start_date?->format('d F Y') }} - {{ $main_newsandevent->end_date?->format('d F Y') }}</div>
                         @else
-                        <div class="date-news">{{ date('d F Y', strtotime($main_newsandevent->created_at)) }}</div>
+                        <div class="date-news">{{ $main_newsandevent->created_at?->format('d F Y') }}</div>
                         @endif
                         <div class="title-news">
                             <a href="{{ url('news-and-events/'.$main_newsandevent->permalink) }}">
@@ -48,7 +48,7 @@
                                     @endif
                                 </a>
                             </div>
-                            <div class="date">{{ date('d F Y', strtotime($newsandevent->created_at)) }}</div>
+                            <div class="date">{{ $newsandevent->created_at?->format('d F Y') }}</div>
                             <a href="{{ url('news-and-events/'.$main_newsandevent->permalink) }}">
                                 <h4>{{ $newsandevent->title }}</h4>
                             </a>
@@ -67,7 +67,7 @@
                                     @endif
                                 </a>
                             </div>
-                            <div class="date">{{ date('d F Y', strtotime($newsandevent->created_at)) }}</div>
+                            <div class="date">{{ $newsandevent->created_at?->format('d F Y') }}</div>
                             <a href="{{ url('news-and-events/'.$main_newsandevent->permalink) }}">
                                 <h4>{{ $newsandevent->title }}</h4>
                             </a>
@@ -88,7 +88,7 @@
                                     @endif
                                 </a>
                             </div>
-                            <div class="date">{{ date('d F Y', strtotime($newsandevent->start_date)) }} - {{ date('d F Y', strtotime($newsandevent->end_date)) }}</div>
+                            <div class="date">{{ $newsandevent->start_date?->format('d F Y') }} - {{ $newsandevent->end_date?->format('d F Y') }}</div>
                             <a href="{{ url('news-and-events/'.$main_newsandevent->permalink) }}">
                                 <h4>{{ $newsandevent->title }}</h4>
                             </a>
@@ -106,7 +106,7 @@
                                     @endif
                                 </a>
                             </div>
-                            <div class="date">{{ date('d F Y', strtotime($newsandevent->created_at)) }}</div>
+                            <div class="date">{{ $newsandevent->created_at?->format('d F Y') }}</div>
                             <a href="{{ url('news-and-events/'.$main_newsandevent->permalink) }}">
                                 <h4>{{ $newsandevent->title }}</h4>
                             </a>

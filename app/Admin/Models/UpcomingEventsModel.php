@@ -20,20 +20,32 @@ class UpcomingEventsModel extends Model {
         'end_date'    => 'datetime',
     ];
 
+    // Zero dates are now NULL in the database. Carbon::parse(null) returns
+    // the CURRENT time, so an undated row would silently render as today —
+    // hence the explicit null check rather than relying on the cast. The
+    // '0000-00-00' arm is kept so the accessor still behaves on any database
+    // that has not had 03-zero-dates.sql applied.
     public function getEventsDateAttribute($data) {
-        if($data == '0000-00-00') return '0000-00-00';
-        else return Carbon::parse($data);
+        if (is_null($data) || strpos((string) $data, '0000-00-00') === 0) {
+            return null;
+        }
+
+        return Carbon::parse($data);
     }
 
     public function getStartDateAttribute($data) {
-        if($data == '0000-00-00') return '0000-00-00';
-        else return Carbon::parse($data);
+        if (is_null($data) || strpos((string) $data, '0000-00-00') === 0) {
+            return null;
+        }
 
+        return Carbon::parse($data);
     }
 
     public function getEndDateAttribute($data) {
-        if($data == '0000-00-00') return '0000-00-00';
-        else return Carbon::parse($data);
+        if (is_null($data) || strpos((string) $data, '0000-00-00') === 0) {
+            return null;
+        }
 
+        return Carbon::parse($data);
     }
 }

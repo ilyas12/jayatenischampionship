@@ -31,9 +31,9 @@
                             <img src="{{ URL::asset('resources/assets/uploads/news_and_events/'.$newsandevent_detail->img) }}" class="img-responsive">
                         </div>
                         @if ( $newsandevent_detail->period_time == 1 )
-                        <div class="date-news">{{ date('d F Y', strtotime($newsandevent_detail->start_date)) }} - {{ date('d F Y', strtotime($newsandevent_detail->end_date)) }}</div>
+                        <div class="date-news">{{ $newsandevent_detail->start_date?->format('d F Y') }} - {{ $newsandevent_detail->end_date?->format('d F Y') }}</div>
                         @else
-                        <div class="date-news">{{ date('d F Y', strtotime($newsandevent_detail->created_at)) }}</div>
+                        <div class="date-news">{{ $newsandevent_detail->created_at?->format('d F Y') }}</div>
                         @endif
                         <div class="title-news">
                             <h3>{{ $newsandevent_detail->title }}</h3>

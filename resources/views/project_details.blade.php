@@ -55,7 +55,7 @@
                     </div>
 
                     <div class="project-detail-content">
-                        <div class="pagedetail-date">{{ date('d F Y', strtotime($project_detail->created_at)) }}</div>
+                        <div class="pagedetail-date">{{ $project_detail->created_at?->format('d F Y') }}</div>
                         <div class="pagedetail-title">
                             <div class="title">{{ $project_detail->name }}</div>
                             <span class="pagedetail-title-bordered"></span>

@@ -49,8 +49,23 @@ return [
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => env('DB_PREFIX', ''),
-            'strict' => false,
-            'engine' => null,
+            'strict' => true,
+            'engine' => 'InnoDB',
+
+            // Laravel's 'strict' set also includes ONLY_FULL_GROUP_BY, which is a
+            // query-style rule rather than a data-integrity one, and several of
+            // this CMS's legacy GROUP BY queries select columns they do not
+            // group by — the homepage's product-category listing is one. Listing
+            // the modes explicitly keeps the protections that matter (rejecting
+            // truncated writes and zero dates) without having to rewrite those
+            // queries first. Removing this key is the goal once they are fixed.
+            'modes' => [
+                'STRICT_TRANS_TABLES',
+                'NO_ZERO_IN_DATE',
+                'NO_ZERO_DATE',
+                'ERROR_FOR_DIVISION_BY_ZERO',
+                'NO_ENGINE_SUBSTITUTION',
+            ],
         ],
 
         'pgsql' => [
