@@ -118,6 +118,36 @@ for path in .env vendor/autoload.php app/User.php composer.json cms-template-eng
     expect "$BASE/$path" 403 "GET /$path is denied"
 done
 
+# The admin upload path resizes every image through Imagine. It is not
+# reachable over plain HTTP without posting a multipart upload, so exercise the
+# same call chain directly in the container instead.
+head_ "Image pipeline (Imagine thumbnail + effects)"
+IMG_SRC="$(find resources/assets/uploads -name '*.jpg' 2>/dev/null | head -1)"
+if [ -n "$IMG_SRC" ] && docker compose ps app >/dev/null 2>&1; then
+    IMG_RESULT="$(docker compose exec -T app php -r '
+        require "vendor/autoload.php";
+        $app = require_once "bootstrap/app.php";
+        $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        $out = "/tmp/smoke-thumb.jpg";
+        @unlink($out);
+        Image::open($argv[1])->thumbnail(new Imagine\Image\Box(150, 150))->save($out);
+        $fx = Image::open($argv[1])->thumbnail(new Imagine\Image\Box(80, 80));
+        $fx->effects()->colorize(Image::open($argv[1])->palette()->color("#336699"));
+        $fx->effects()->blur(1);
+        $fx->effects()->grayscale();
+        $fx->save("/tmp/smoke-fx.jpg");
+        echo (file_exists($out) && file_exists("/tmp/smoke-fx.jpg")) ? "OK" : "FAILED";
+    ' "$IMG_SRC" 2>&1 | tail -1)"
+
+    if [ "$IMG_RESULT" = "OK" ]; then
+        ok "thumbnail and effects chain produce output"
+    else
+        bad "image pipeline failed: $IMG_RESULT"
+    fi
+else
+    printf '  \033[33mSKIP\033[0m  image pipeline — no sample upload or container not running\n'
+fi
+
 head_ "No PHP errors leaking into responses"
 LEAK=0
 for path in "" rates branches news-and-events underlying contact; do

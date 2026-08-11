@@ -165,7 +165,6 @@ return [
 //        // terre\Providers\BroadcastServiceProvider::class,
 //        terre\Providers\EventServiceProvider::class,
 //        terre\Providers\RouteServiceProvider::class,
-        Folklore\Image\ImageServiceProvider::class,
     ],
 
     /*
@@ -224,7 +223,7 @@ return [
         /**
          * for Scaffold Admin
          */
-        'Image'     => Folklore\Image\Facades\Image::class,
+        'Image'     => terre\Libraries\Image::class,
 
     ],
 
