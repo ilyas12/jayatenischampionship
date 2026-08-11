@@ -49,7 +49,7 @@ class ProductByCategory extends ScaffoldController {
                 $this->data['sub_title'] = "Order ".$this->module_name;
                 if (\Request::has('type')){
                     \Cache::forget('type');
-                    \Cache::add('type',\Request::input('type'), 60);
+                    \Cache::add('type',\Request::input('type'), 3600); // 5.8+: TTL is seconds (was 60 minutes)
                 }
                 $type = \Cache::get('type');
                 if ($type == "category"){

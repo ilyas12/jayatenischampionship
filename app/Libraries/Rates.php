@@ -9,7 +9,8 @@ use Log;
 class Rates
 {
     const CACHE_KEY = 'exchange_rates';
-    const CACHE_MINUTES = 10;
+    // Laravel 5.8 changed cache TTLs from minutes to seconds.
+    const CACHE_SECONDS = 600;
 
     /**
      * Return complete exchange data.
@@ -43,7 +44,7 @@ class Rates
 
         $result = $this->parse($csv);
 
-        Cache::put(self::CACHE_KEY, $result, self::CACHE_MINUTES);
+        Cache::put(self::CACHE_KEY, $result, self::CACHE_SECONDS);
 
         return $result;
     }
