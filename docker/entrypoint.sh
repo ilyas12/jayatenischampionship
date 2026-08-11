@@ -19,12 +19,33 @@ mkdir -p \
 
 # Wait for MariaDB before handing over to Apache, so the first request does not
 # land on a still-importing database.
+#
+# The probe goes through PDO rather than the mysqladmin client on purpose: it is
+# the exact driver the application connects with, so it cannot disagree with the
+# app about whether the database is reachable. The bundled client did diverge —
+# from Debian trixie it defaults to requiring TLS and refuses a plaintext
+# MariaDB 10.6 server that PDO connects to happily, which hung this script for
+# the full timeout on every start.
 if [ -n "${DB_HOST:-}" ]; then
     echo "entrypoint: waiting for database at ${DB_HOST}..."
     for i in $(seq 1 60); do
-        if mysqladmin ping -h"${DB_HOST}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" --silent >/dev/null 2>&1; then
+        if php -r '
+            try {
+                new PDO(
+                    "mysql:host=".getenv("DB_HOST").";dbname=".getenv("DB_DATABASE"),
+                    getenv("DB_USERNAME"),
+                    getenv("DB_PASSWORD")
+                );
+                exit(0);
+            } catch (Throwable $e) {
+                exit(1);
+            }
+        ' >/dev/null 2>&1; then
             echo "entrypoint: database is up"
             break
+        fi
+        if [ "$i" -eq 60 ]; then
+            echo "entrypoint: database still unreachable after 120s — starting Apache anyway" >&2
         fi
         sleep 2
     done
