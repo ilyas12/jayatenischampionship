@@ -163,7 +163,6 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
-        Illuminate\Html\HtmlServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -234,8 +233,8 @@ return [
         'Input' => Illuminate\Support\Facades\Input::class,
 
 
-        'Form' => Illuminate\Html\FormFacade::class,
-        'HTML' => Illuminate\Html\HtmlFacade::class,
+        'Form' => terre\Libraries\Html\FormBuilder::class,
+        'HTML' => terre\Libraries\Html\HtmlBuilder::class,
         'Alert' => terre\Libraries\Alert::class,
         'JS' => terre\Libraries\JS::class,
 

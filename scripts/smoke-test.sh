@@ -32,6 +32,14 @@ expect() { # url expected-code label
     if [ "$got" = "$2" ]; then ok "$3 ($got)"; else bad "$3 — expected $2, got $got"; fi
 }
 
+# Same as expect(), but sends the session cookie so admin routes are reached as
+# a logged-in user rather than being bounced to the login screen.
+expect_auth() { # url expected-code label
+    local got
+    got="$(curl -s -b "$COOKIES" -o "$BODY" -w '%{http_code}' --max-time 30 "$1")"
+    if [ "$got" = "$2" ]; then ok "$3 ($got)"; else bad "$3 — expected $2, got $got"; fi
+}
+
 head_ "Public pages"
 for path in "" rates branches news-and-events underlying contact; do
     expect "$BASE/$path" 200 "GET /$path"
@@ -74,6 +82,35 @@ if [ "$CODE" = "302" ] || [ "$CODE" = "200" ]; then
     ok "bad-password login handled gracefully ($CODE)"
 else
     bad "bad-password login returned $CODE — expected 302/200"
+fi
+
+# Seeded by scripts/seed-test-admin.sh. Without it the authenticated section is
+# skipped rather than failed, so the script still works against environments
+# that have no test account.
+head_ "Admin panel (authenticated)"
+LOGIN_CODE="$(curl -s -b "$COOKIES" -c "$COOKIES" -o /dev/null -w '%{http_code}' --max-time 30 \
+    -X POST "$BASE/$ADMIN_PREFIX/login/dologin" \
+    -d "_token=$TOKEN" -d "email=smoke@test.local" -d "password=smoketest123")"
+
+if curl -s -b "$COOKIES" --max-time 30 "$BASE/$ADMIN_PREFIX/setting" | grep -q "<form"; then
+    ok "logged in as the test admin ($LOGIN_CODE)"
+
+    # These pages between them exercise every Form:: helper the app uses:
+    # open/close, text, textarea, select, label, checkbox, radio and hidden.
+    for path in setting about news-and-event administrator location contact_address; do
+        expect_auth "$BASE/$ADMIN_PREFIX/$path" 200 "GET admin /$path"
+    done
+
+    for path in setting about administrator; do
+        if curl -s -b "$COOKIES" --max-time 30 "$BASE/$ADMIN_PREFIX/$path" \
+            | grep -qiE "(Fatal error|Parse error|Whoops, looks like something went wrong)"; then
+            bad "admin /$path renders a PHP error"
+        else
+            ok "admin /$path renders without PHP errors"
+        fi
+    done
+else
+    printf '  \033[33mSKIP\033[0m  admin panel — no smoke@test.local account (run scripts/seed-test-admin.sh)\n'
 fi
 
 head_ "Application internals must not be reachable over HTTP"
