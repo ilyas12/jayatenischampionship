@@ -7,9 +7,10 @@ services:
         # Bumped as the framework upgrade progresses toward Laravel 11 / PHP 8.2.
         PHP_VERSION: "${DOCKER_PHP_VERSION:-8.3}"
         COMPOSER_VERSION: "${DOCKER_COMPOSER_VERSION:-2}"
-    # php:7.1-apache is published for linux/amd64 only; on Apple Silicon this
-    # runs under emulation.
-    platform: linux/amd64
+    # No platform pin: php:8.3-apache has a native arm64 build. The PHP 7.x
+    # images were amd64-only and had to be emulated, which cost roughly 2.5s per
+    # request on Apple Silicon. Re-add `platform: linux/amd64` if you set
+    # DOCKER_PHP_VERSION back to a 7.x release to bisect something.
     ports:
       # DOCKER_-prefixed so Compose's automatic read of the Laravel .env in this
       # directory cannot collide with these (that .env defines DB_PORT=3306).
