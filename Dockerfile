@@ -34,6 +34,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
+        # mbstring stopped bundling oniguruma in PHP 7.4.
+        libonig-dev \
         libzip-dev \
         zlib1g-dev \
         default-mysql-client \

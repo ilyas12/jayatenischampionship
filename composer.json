@@ -8,14 +8,14 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^7.3",
-        "laravel/framework": "^8.0",
+        "php": "^8.0",
+        "laravel/framework": "^9.0",
         "imagine/imagine": "^1.5"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
-        "mockery/mockery": "^1.4.2",
-        "phpunit/phpunit": "^9.3",
+        "mockery/mockery": "^1.4.4",
+        "phpunit/phpunit": "^9.5.10",
         "fakerphp/faker": "^1.9"
     },
     "autoload": {
@@ -47,6 +47,11 @@
         "preferred-install": "dist",
         "allow-plugins": {
             "kylekatarnls/update-helper": true
+        },
+        "policy": {
+            "advisories": {
+                "block": false
+            }
         }
     }
 }
