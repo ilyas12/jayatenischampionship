@@ -8,14 +8,14 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^7.2.5",
-        "laravel/framework": "^7.0",
+        "php": "^7.3",
+        "laravel/framework": "^8.0",
         "imagine/imagine": "^1.5"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
-        "mockery/mockery": "^1.0",
-        "phpunit/phpunit": "^8.5",
+        "mockery/mockery": "^1.4.2",
+        "phpunit/phpunit": "^9.3",
         "fakerphp/faker": "^1.9"
     },
     "autoload": {
