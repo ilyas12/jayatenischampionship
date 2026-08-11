@@ -3,6 +3,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # Bumped as the framework upgrade progresses toward Laravel 11 / PHP 8.2.
+        PHP_VERSION: "${DOCKER_PHP_VERSION:-7.1}"
+        COMPOSER_VERSION: "${DOCKER_COMPOSER_VERSION:-2.2}"
     # php:7.1-apache is published for linux/amd64 only; on Apple Silicon this
     # runs under emulation.
     platform: linux/amd64

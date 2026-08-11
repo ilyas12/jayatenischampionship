@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+#
+# Regression check for the Laravel 5.4 -> 11 upgrade. Run after every version
+# bump; a step is not done until this exits 0.
+#
+#   ./scripts/smoke-test.sh [base-url]
+#
+set -uo pipefail
+
+BASE="${1:-http://localhost:8088}"
+PASS=0
+FAIL=0
+COOKIES="$(mktemp)"
+BODY="$(mktemp)"
+trap 'rm -f "$COOKIES" "$BODY"' EXIT
+
+ok()   { printf '  \033[32mPASS\033[0m  %s\n' "$1"; PASS=$((PASS + 1)); }
+bad()  { printf '  \033[31mFAIL\033[0m  %s\n' "$1"; FAIL=$((FAIL + 1)); }
+head_() { printf '\n\033[1m%s\033[0m\n' "$1"; }
+
+# The admin panel lives behind an obfuscated prefix in routes/web.php. Read it
+# from the source so this keeps working if the routes are restructured.
+ADMIN_PREFIX="$(grep -oE "'prefix'[[:space:]]*=>[[:space:]]*'[^']+'" routes/web.php 2>/dev/null \
+    | head -1 | sed "s/.*'\\([^']*\\)'$/\\1/")"
+: "${ADMIN_PREFIX:=_d50d0608e7c3270b3f0e3753f996387b}"
+
+status() { curl -s -o "$BODY" -w '%{http_code}' --max-time 30 "$1"; }
+
+expect() { # url expected-code label
+    local got
+    got="$(status "$1")"
+    if [ "$got" = "$2" ]; then ok "$3 ($got)"; else bad "$3 — expected $2, got $got"; fi
+}
+
+head_ "Public pages"
+for path in "" rates branches news-and-events underlying contact; do
+    expect "$BASE/$path" 200 "GET /$path"
+done
+
+head_ "Dynamic content (proves the DB import and slug routing work)"
+DETAIL="$(curl -s --max-time 30 "$BASE/news-and-events" \
+    | grep -oE 'href="[^"]*/news-and-events/[^"]+"' | head -1 \
+    | sed 's/href="//;s/"$//')"
+if [ -n "$DETAIL" ]; then
+    case "$DETAIL" in http*) ;; *) DETAIL="$BASE$DETAIL" ;; esac
+    expect "$DETAIL" 200 "GET a news detail page"
+else
+    bad "no news detail link found on /news-and-events"
+fi
+
+head_ "Static assets"
+for asset in resources/assets/css/style.css resources/assets/js/jquery.js; do
+    expect "$BASE/$asset" 200 "GET /$asset"
+done
+
+head_ "Admin authentication"
+expect "$BASE/$ADMIN_PREFIX/login" 200 "GET admin login"
+
+TOKEN="$(curl -s -c "$COOKIES" --max-time 30 "$BASE/$ADMIN_PREFIX/login" \
+    | grep -oE 'name="_token"[^>]*value="[^"]*"' | head -1 \
+    | sed 's/.*value="//;s/"$//')"
+if [ -n "$TOKEN" ]; then
+    ok "login form issues a CSRF token (sessions are writable)"
+else
+    bad "no CSRF token in the login form — sessions or storage/ are broken"
+fi
+
+# A wrong password must redirect back, not 500. This exercises the session,
+# the DB query and the bcrypt check in one request.
+CODE="$(curl -s -b "$COOKIES" -c "$COOKIES" -o "$BODY" -w '%{http_code}' --max-time 30 \
+    -X POST "$BASE/$ADMIN_PREFIX/login/dologin" \
+    -d "_token=$TOKEN" -d "email=admin@admin.com" -d "password=wrong-on-purpose-$$")"
+if [ "$CODE" = "302" ] || [ "$CODE" = "200" ]; then
+    ok "bad-password login handled gracefully ($CODE)"
+else
+    bad "bad-password login returned $CODE — expected 302/200"
+fi
+
+head_ "Application internals must not be reachable over HTTP"
+for path in .env vendor/autoload.php app/User.php composer.json cms-template-engine.sql resources/views; do
+    expect "$BASE/$path" 403 "GET /$path is denied"
+done
+
+head_ "No PHP errors leaking into responses"
+LEAK=0
+for path in "" rates branches news-and-events underlying contact; do
+    if curl -s --max-time 30 "$BASE/$path" \
+        | grep -qiE "(Fatal error|Parse error|Warning</b>|Notice</b>|Whoops, looks like something went wrong|Deprecated:)"; then
+        bad "/$path renders a PHP error or Whoops page"
+        LEAK=1
+    fi
+done
+[ "$LEAK" -eq 0 ] && ok "no PHP errors or Whoops pages in any public response"
+
+printf '\n\033[1mResult:\033[0m %d passed, %d failed\n' "$PASS" "$FAIL"
+[ "$FAIL" -eq 0 ] || exit 1
