@@ -107,6 +107,24 @@ LOGIN_CODE="$(curl -s -b "$COOKIES" -c "$COOKIES" -o /dev/null -w '%{http_code}'
 if curl -s -b "$COOKIES" --max-time 30 "$BASE/$ADMIN_PREFIX/setting" | grep -q "<form"; then
     ok "logged in as the test admin ($LOGIN_CODE)"
 
+    # Log in a second time with a fresh session. Laravel 11+ rehashes the
+    # password during a successful login, so a bug in the password mutator
+    # corrupts the stored hash on the FIRST login and only shows up on the
+    # second. A single login attempt cannot catch that class of bug.
+    COOKIES2="$(mktemp)"
+    TOKEN2="$(curl -s -c "$COOKIES2" --max-time 30 "$BASE/$ADMIN_PREFIX/login" \
+        | grep -oE 'name="_token"[^>]*value="[^"]*"' | head -1 | sed 's/.*value="//;s/"$//')"
+    curl -s -b "$COOKIES2" -c "$COOKIES2" -o /dev/null --max-time 30 \
+        -X POST "$BASE/$ADMIN_PREFIX/login/dologin" \
+        -d "_token=$TOKEN2" -d "email=smoke@test.local" -d "password=smoketest123"
+
+    if curl -s -b "$COOKIES2" --max-time 30 "$BASE/$ADMIN_PREFIX/setting" | grep -q "<form"; then
+        ok "second login still works — the stored password hash survived the first"
+    else
+        bad "second login failed — the first login corrupted the password hash"
+    fi
+    rm -f "$COOKIES2"
+
     # These pages between them exercise every Form:: helper the app uses:
     # open/close, text, textarea, select, label, checkbox, radio and hidden.
     for path in setting about news-and-event administrator location contact_address; do
