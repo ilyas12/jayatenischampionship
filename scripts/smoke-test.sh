@@ -56,6 +56,18 @@ else
     bad "no news detail link found on /news-and-events"
 fi
 
+# The exception handler is easy to break silently on a version bump — Laravel 7
+# retyped report()/render() from Exception to Throwable, which stopped the
+# Handler class loading at all without any passing request noticing.
+head_ "Error handling"
+expect "$BASE/this-route-does-not-exist-$$" 404 "unknown route returns 404"
+if curl -s --max-time 30 "$BASE/this-route-does-not-exist-$$" \
+    | grep -qiE "(Fatal error|must be compatible with|ReflectionException)"; then
+    bad "the 404 page reports a PHP fatal — the exception handler is broken"
+else
+    ok "404 renders through the exception handler cleanly"
+fi
+
 head_ "Static assets"
 for asset in resources/assets/css/style.css resources/assets/js/jquery.js; do
     expect "$BASE/$asset" 200 "GET /$asset"
