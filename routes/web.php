@@ -127,6 +127,17 @@ $router->group([
 $router->group([
     'namespace' => 'Http\Controllers'
 ], function ($router) {
+    /**
+     * Swarnadwipa theme, sliced from "WEB YAYASAN SPD.psd". Static preview of
+     * the two designed pages; kept on its own prefix so it cannot affect the
+     * live site.
+     */
+    $router->group(['prefix' => 'home-new'], function ($router) {
+        Route::get('/', array('as' => 'spd_home', 'uses' => 'HomeNew@index'));
+        Route::get('/tentang', array('as' => 'spd_tentang', 'uses' => 'HomeNew@tentang'));
+        Route::get('/donasi', array('as' => 'spd_donasi', 'uses' => 'HomeNew@donasi'));
+    });
+
     Route::get('/', array('as' => 'home_terre', 'uses' => 'HomePage@index_dsv2'));
     Route::get('/branches', array('as' => 'dev_branches', 'uses' => 'Stores@index_dsv2'));
     Route::get('/about', array('as' => 'dev_about', 'uses' => 'About@index_dsv2'));

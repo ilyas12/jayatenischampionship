@@ -45,6 +45,16 @@ for path in "" rates branches news-and-events underlying contact; do
     expect "$BASE/$path" 200 "GET /$path"
 done
 
+# Static theme sliced from the Swarnadwipa PSDs. It shares the layout and the
+# asset pipeline with nothing else, so a failure here is isolated to itself.
+head_ "Swarnadwipa theme (/home-new)"
+for path in home-new home-new/tentang home-new/donasi; do
+    expect "$BASE/$path" 200 "GET /$path"
+done
+for asset in css/spd.css vendor/bootstrap/bootstrap.min.css images/logo.png images/hero.jpg; do
+    expect "$BASE/resources/assets/spd/$asset" 200 "GET theme asset $asset"
+done
+
 head_ "Dynamic content (proves the DB import and slug routing work)"
 DETAIL="$(curl -s --max-time 30 "$BASE/news-and-events" \
     | grep -oE 'href="[^"]*/news-and-events/[^"]+"' | head -1 \

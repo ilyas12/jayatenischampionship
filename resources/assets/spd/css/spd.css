@@ -1,0 +1,358 @@
+/* ===========================================================================
+   Yayasan Swarnadwipa Peduli Bangsa — theme sliced from
+   "WEB YAYASAN SPD.psd" (1200x1600 canvas).
+
+   This is a THEME LAYER on top of Bootstrap 5.3.3, not a layout framework of
+   its own: Bootstrap supplies the grid, the container, spacing and the
+   breakpoints, and this file supplies the palette, the type and the component
+   skins taken from the PSD.
+
+   Design values are read from the PSD rather than eyeballed — colours come from
+   the layer style data (the comp uses only #0D4D15 and #FAF1E1), the type is
+   Calibri throughout, and sizes and spacing come from the layer bounding boxes.
+   ======================================================================== */
+
+:root {
+    --spd-green: #0D4D15;
+    --spd-cream: #FAF1E1;
+
+    /* Type sizes as measured in the PSD, in px. */
+    --spd-fs-page-title: 29px;   /* "DONASI KEGIATAN KAMI"        */
+    --spd-fs-section:    33px;   /* "TENTANG YAYASAN SWARNADWIPA" */
+    --spd-fs-card-title: 25px;
+    --spd-fs-body:       25px;
+    --spd-fs-about:      29px;
+    --spd-fs-nav:        21px;
+    --spd-fs-footer-h:   29px;
+    --spd-fs-footer:     21px;
+    --spd-fs-copyright:  17px;
+
+    --spd-border: 3px;
+
+    /* Bootstrap overrides. The comp is a 1200px canvas, so the container is
+       pinned to 1200px at the top breakpoint instead of Bootstrap's 1140/1320,
+       which is what keeps the layout at the design's true width and centred
+       rather than stretching to the monitor. */
+    --bs-body-bg: var(--spd-cream);
+    --bs-body-color: var(--spd-green);
+    --bs-link-color: var(--spd-green);
+    --bs-link-hover-color: var(--spd-green);
+    --bs-border-color: var(--spd-green);
+}
+
+/* Bootstrap's .container maxes out at 1140px (xl) and 1320px (xxl). Pin both to
+   the PSD's 1200px so the content column is exactly the designed width at any
+   monitor size, and let Bootstrap's smaller breakpoints handle the rest. */
+@media (min-width: 1200px) {
+    .container,
+    .container-lg,
+    .container-md,
+    .container-sm,
+    .container-xl { max-width: 1200px; }
+}
+
+@media (min-width: 1400px) {
+    .container,
+    .container-lg,
+    .container-md,
+    .container-sm,
+    .container-xl,
+    .container-xxl { max-width: 1200px; }
+}
+
+body.spd {
+    background: var(--spd-cream);
+    /* Calibri is the design font. Carlito is its metric-compatible open
+       counterpart on Linux; the rest are fallbacks in decreasing similarity. */
+    font-family: Calibri, Carlito, "Segoe UI", Candara, Optima, system-ui, sans-serif;
+    color: var(--spd-green);
+    -webkit-font-smoothing: antialiased;
+}
+
+.spd a { color: var(--spd-green); text-decoration: none; }
+.spd a:hover { color: var(--spd-green); }
+
+
+/* --- Header -------------------------------------------------------------
+   In the PSD the green bar runs full width (y 51–142, so 91px tall) while the
+   132px logo badge straddles it on a cream plate, which is what gives the badge
+   its punched-through look. The bar stays full-bleed; only its contents are
+   constrained to the container.
+   ---------------------------------------------------------------------- */
+
+.spd-header { background: var(--spd-cream); padding-top: 31px; }
+
+.spd-header__bar {
+    background: var(--spd-green);
+    min-height: 91px;
+    display: flex;
+    align-items: center;
+}
+
+.spd-logo {
+    flex: 0 0 auto;
+    width: 132px;
+    height: 132px;
+    margin: -20px 0;          /* straddle the 91px bar */
+    background: var(--spd-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spd-logo img { width: 132px; height: 132px; object-fit: contain; }
+
+.spd-nav a,
+.spd-nav .spd-nav__sep {
+    color: var(--spd-cream);
+    font-size: var(--spd-fs-nav);
+    font-weight: 700;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
+
+.spd-nav a { padding: 6px 8px; }
+.spd-nav a:hover,
+.spd-nav a:focus-visible,
+.spd-nav a[aria-current="page"] { color: var(--spd-cream); text-decoration: underline; }
+
+/* The rules between nav items are literal "I" glyphs in the comp. */
+.spd-nav__sep { opacity: .9; }
+
+.spd-header__wa img { width: 40px; height: 45px; }
+
+/* Bootstrap's collapse toggler, restyled for the cream-on-green bar. */
+.spd-toggler {
+    border-color: rgba(250, 241, 225, .55);
+    padding: 4px 10px;
+}
+
+.spd-toggler:focus { box-shadow: 0 0 0 .2rem rgba(250, 241, 225, .3); }
+
+.spd-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FAF1E1' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+
+/* --- Section heading box ------------------------------------------------
+   PSD: 322x52 box, 3px green border, cream fill.
+   ---------------------------------------------------------------------- */
+
+.spd-heading {
+    display: inline-block;
+    border: var(--spd-border) solid var(--spd-green);
+    background: var(--spd-cream);
+    padding: 12px 22px;
+    margin: 0;
+    font-size: var(--spd-fs-page-title);
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.spd-heading--section { font-size: var(--spd-fs-section); }
+
+
+/* --- Donation cards -----------------------------------------------------
+   PSD geometry: a 304x304 framed photo beside a 514x51 title box and a 514x227
+   detail box, 27px apart. Bootstrap's grid handles the two columns; these rules
+   only supply the skin.
+   ---------------------------------------------------------------------- */
+
+.spd-card__media {
+    border: var(--spd-border) solid var(--spd-green);
+    background: var(--spd-cream);
+    padding: 1px;
+}
+
+.spd-card__media img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.spd-card__title {
+    border: var(--spd-border) solid var(--spd-green);
+    padding: 12px 16px;
+    margin: 0;
+    font-size: var(--spd-fs-card-title);
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.spd-card__detail {
+    border: var(--spd-border) solid var(--spd-green);
+    padding: 30px 16px 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+/* The figures are a tab-aligned block in the comp. A definition list keeps that
+   alignment without depending on tab stops, and reads as label/value pairs. */
+.spd-facts {
+    margin: 0;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 0;
+    font-size: var(--spd-fs-body);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.spd-facts dt { grid-column: 1; padding-right: 18px; font-weight: 700; }
+.spd-facts dd { grid-column: 2; margin: 0; }
+.spd-facts dd::before { content: ": "; }
+
+/* Selector carries `a` so it outranks the `.spd a` colour rule above, which is
+   also specificity 0-1-1 — without it the label renders green on green and the
+   button reads as an empty block. */
+.spd a.spd-btn,
+button.spd-btn {
+    display: inline-block;
+    min-width: 180px;
+    padding: 13px 24px;
+    background: var(--spd-green);
+    color: var(--spd-cream);
+    font-size: var(--spd-fs-card-title);
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    border: var(--spd-border) solid var(--spd-green);
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.spd a.spd-btn:hover,
+.spd a.spd-btn:focus-visible,
+button.spd-btn:hover,
+button.spd-btn:focus-visible { background: var(--spd-cream); color: var(--spd-green); }
+
+
+/* --- Hero (about page) --------------------------------------------------
+   PSD: full-bleed 1200x900 photo directly under the nav.
+   ---------------------------------------------------------------------- */
+
+.spd-hero {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    max-height: 900px;
+    overflow: hidden;
+    background: var(--spd-green);
+}
+
+.spd-hero img { width: 100%; height: 100%; object-fit: cover; }
+
+
+/* --- Prose box (about page) --------------------------------------------
+   PSD: 1085x333 box, ~29px text on a ~30px line.
+   ---------------------------------------------------------------------- */
+
+.spd-prose {
+    border: var(--spd-border) solid var(--spd-green);
+    padding: 30px 26px;
+    font-size: var(--spd-fs-about);
+    line-height: 1.32;
+}
+
+.spd-prose p:last-child { margin-bottom: 0; }
+
+
+/* --- Footer -------------------------------------------------------------
+   PSD: 198px green band; sitemap left, logo plate centred, address right,
+   copyright centred beneath.
+   ---------------------------------------------------------------------- */
+
+.spd-footer {
+    background: var(--spd-green);
+    color: var(--spd-cream);
+    padding: 46px 0 18px;
+}
+
+.spd-footer a { color: var(--spd-cream); }
+.spd-footer a:hover { color: var(--spd-cream); text-decoration: underline; }
+
+.spd-footer h2 {
+    margin: 0 0 14px;
+    font-size: var(--spd-fs-footer-h);
+    font-weight: 700;
+}
+
+.spd-footer__sitemap ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 2;
+    column-gap: 40px;
+    font-size: var(--spd-fs-footer);
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.spd-footer__logo {
+    width: 108px;
+    height: 106px;
+    background: rgba(250, 241, 225, .18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spd-footer__logo img { width: 97px; height: 98px; object-fit: contain; }
+
+.spd-footer__address {
+    font-size: var(--spd-fs-footer);
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.spd-footer__address p { margin: 0; }
+
+.spd-footer__copyright {
+    margin: 26px 0 0;
+    font-size: var(--spd-fs-copyright);
+    font-weight: 300;
+}
+
+
+/* --- Responsive ---------------------------------------------------------
+   The comp is a single fixed 1200px desktop artboard with no mobile version, so
+   everything below this line is an interpretation rather than something the
+   design specifies: the type scales down and the grid collapses via Bootstrap's
+   own breakpoints.
+   ---------------------------------------------------------------------- */
+
+@media (max-width: 991.98px) {
+    :root {
+        --spd-fs-page-title: 24px;
+        --spd-fs-section:    27px;
+        --spd-fs-card-title: 21px;
+        --spd-fs-body:       20px;
+        --spd-fs-about:      21px;
+        --spd-fs-nav:        18px;
+        --spd-fs-footer-h:   24px;
+        --spd-fs-footer:     18px;
+    }
+
+    /* Collapsed menu: the items stack, so the "I" separators are dropped and
+       the panel takes the bar's green. */
+    .spd-nav { padding: 10px 0; }
+    .spd-nav .spd-nav__sep { display: none; }
+    .spd-nav a { display: block; padding: 8px 0; }
+}
+
+@media (max-width: 767.98px) {
+    .spd-logo { width: 96px; height: 96px; margin: -12px 0; }
+    .spd-logo img { width: 96px; height: 96px; }
+
+    /* Collapsing to one column needs the explicit placements cleared as well:
+       `grid-column: 2` on the dd would otherwise create an implicit second
+       track and the list would stay side-by-side however narrow it gets. */
+    .spd-facts { grid-template-columns: 1fr; gap: 0; }
+    .spd-facts dt,
+    .spd-facts dd { grid-column: auto; }
+    .spd-facts dd { margin-bottom: 10px; }
+
+    .spd-btn { width: 100%; }
+    .spd-hero { aspect-ratio: 3 / 2; }
+    .spd-prose { padding: 20px 16px; }
+}
