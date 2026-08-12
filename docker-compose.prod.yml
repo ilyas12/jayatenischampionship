@@ -1,0 +1,85 @@
+# Production stack. Deliberately NOT a drop-in twin of docker-compose.yml:
+#
+#   - the source is baked into the image, not bind-mounted, so a deploy is
+#     "build a new image and replace the container";
+#   - no phpMyAdmin;
+#   - every credential comes from the environment, so nothing secret is
+#     committed here.
+#
+# Usage:
+#   cp .env.prod.example .env.prod   # then fill it in, keep it off git
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+#
+# Read the "Production" section of readme.md before the first deploy — in
+# particular the notes on APP_KEY, TLS and the database.
+
+# A distinct project name: without it Compose derives the name from the
+# directory and the production stack recreates the development containers in
+# place, which is exactly as bad as it sounds on a shared machine.
+name: cms-template-engine-prod
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        PHP_VERSION: "8.3"
+        COMPOSER_VERSION: "2"
+    image: cms-template-engine:${APP_VERSION:-latest}
+    restart: always
+    ports:
+      # Bound to loopback: terminate TLS in a reverse proxy in front of this.
+      # Publishing straight to 0.0.0.0:80 would serve the admin login over
+      # plaintext HTTP.
+      - "127.0.0.1:${APP_PORT:-8080}:80"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY:?APP_KEY is required — generate one, see readme.md}
+      APP_URL: ${APP_URL:?APP_URL is required}
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: ${LOG_LEVEL:-warning}
+
+      DB_CONNECTION: mysql
+      DB_HOST: ${DB_HOST:?DB_HOST is required}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:?DB_DATABASE is required}
+      DB_USERNAME: ${DB_USERNAME:?DB_USERNAME is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      DB_PREFIX: ${DB_PREFIX:-terre217_}
+
+      CACHE_DRIVER: file
+      SESSION_DRIVER: file
+      QUEUE_DRIVER: sync
+
+      MAIL_DRIVER: ${MAIL_DRIVER:-smtp}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-tls}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-}
+    volumes:
+      # Uploads and logs are the only state the container writes. Without these
+      # every image uploaded through the CMS is lost on the next deploy, because
+      # the rest of the filesystem is replaced with the new image.
+      - uploads:/var/www/html/resources/assets/uploads
+      - storage:/var/www/html/storage
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/') ? 0 : 1);"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  uploads:
+  storage:

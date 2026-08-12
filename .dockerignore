@@ -1,9 +1,45 @@
+# vendor/ MUST be excluded. The production stage runs `composer install --no-dev`
+# and then `COPY . .`; without this line the host's development vendor tree —
+# phpunit, mockery, faker and their transitive dependencies — is copied straight
+# over that install, silently undoing it.
+vendor
+node_modules
+
+# Never ship credentials. .env.prod.example is a template with empty values, but
+# there is no reason for any of these to be inside an image.
+.env
+.env.docker
+.env.prod
+.env.prod.example
+
 .git
-.DS_Store
+.gitignore
+.gitattributes
+.github
+
+# Local-only tooling and fixtures; the production image has no use for them.
+.backup
+scripts
+tests
+docker/mysql
+cms-template-engine.sql
+*.md
+
+# Leftovers from the original shared host.
 .cagefs
 .cagefs.zip
 .cl.selector
-node_modules
-storage/logs/*.log
+.well-known
+adminemail
+email
+
+.DS_Store
 error_log
 **/error_log
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+npm-debug.log
+yarn-error.log

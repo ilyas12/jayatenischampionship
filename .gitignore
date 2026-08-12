@@ -28,3 +28,4 @@ yarn-error.log
 !/storage/**/.gitkeep
 /bootstrap/cache/*
 !/bootstrap/cache/.gitignore
+.env.prod

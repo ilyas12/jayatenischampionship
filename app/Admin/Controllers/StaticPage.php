@@ -85,7 +85,7 @@ class StaticPage extends ScaffoldController {
     }
 
     protected function _get_url($permalink) {
-        return env('APP_URL').'pages/'.$permalink;
+        return config('app.url').'pages/'.$permalink;
     }
 
     private function _add(){

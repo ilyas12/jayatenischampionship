@@ -83,7 +83,7 @@ class StaticPageOnMenu extends ScaffoldController {
     }
 
     protected function _get_url($permalink) {
-        return env('APP_URL').'page/'.$permalink;
+        return config('app.url').'page/'.$permalink;
     }
 
     private function _add(){

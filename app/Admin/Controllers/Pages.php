@@ -74,7 +74,7 @@ class Pages extends ScaffoldController {
     }
 
     protected function _get_url($permalink) {
-        return env('APP_URL').'/'.$permalink;
+        return config('app.url').'/'.$permalink;
     }
 
     private function _add(){
