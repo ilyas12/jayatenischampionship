@@ -88,6 +88,12 @@ class EventTeamModel extends Model
         return url('resources/assets/tennis/img/teams/' . $code . '.svg');
     }
 
+    /** Stand-in when a club has neither an upload nor crest artwork. */
+    public function getPlaceholderPhotoUrlAttribute()
+    {
+        return EventTeamMemberModel::placeholderFor($this->id);
+    }
+
     /** The value the front-end filter buttons match on. */
     public function getFilterKeyAttribute()
     {

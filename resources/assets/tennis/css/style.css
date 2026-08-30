@@ -455,8 +455,8 @@ a:hover{ color:var(--purple); }
 
 .member-avatar {
   flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   overflow: hidden;
   display: inline-flex;
@@ -471,7 +471,15 @@ a:hover{ color:var(--purple); }
    stronger element in a mixed list. */
 /* The same figure in the list's small disc. Height-fitted rather than
    stretched, since the silhouette is 3:4 and the disc is round. */
-.member-avatar .tennis-silhouette { height: 78%; width: auto; opacity: .4; }
+/* Contained rather than cropped. Zooming into a full-body card at this size
+   lands on an arm or a skirt and reads as a smudge; the whole figure, small,
+   still reads as a player. The disc is a little larger to give it room. */
+.member-avatar__illustration {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #F1EDE2;
+}
 
 .member-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -601,16 +609,16 @@ a:hover{ color:var(--purple); }
   .team-facts__grid { grid-template-columns: repeat(2, 1fr); gap: 0 1rem; }
 }
 
-/* A team with no crest artwork and no upload — a club that came in through the
-   entry form — gets the same silhouette treatment as an unphotographed player,
-   rather than the CMS's generic "No Image" graphic. */
-.team-card__placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* A club with no crest artwork and no upload — one that came in through the
+   entry form — gets the illustrated stand-in rather than the CMS's generic
+   "No Image" graphic. The card is 3:2 and the illustration 3:4, so it is
+   anchored high: centring would crop the figure through the knees. */
+/* Contained, not cropped: a 3:4 illustration inside a 3:2 frame has no crop
+   that keeps the figure whole. The artwork's own ground is the same cream, so
+   the letterboxing reads as margin rather than as a gap. */
+.team-card__illustration {
   width: 100%;
   height: 100%;
-  background: #F4F1EA;
+  object-fit: contain;
+  background: #F1EDE2;
 }
-
-.team-card__placeholder .tennis-silhouette { height: 62%; width: auto; color: #0A4A2A; opacity: .22; }

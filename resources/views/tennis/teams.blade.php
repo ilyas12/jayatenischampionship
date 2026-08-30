@@ -56,9 +56,8 @@
                     <img src="{{ $team->photo_url }}" alt="{{ $team->name }} squad"
                          width="720" height="480" loading="lazy">
                   @else
-                    <span class="team-card__placeholder">
-                      @include('tennis.partials.silhouette')
-                    </span>
+                    <img src="{{ $team->placeholder_photo_url }}" alt=""
+                         class="team-card__illustration" width="720" height="480" loading="lazy">
                   @endif
                 </a>
                 @if ($team->short_code)
@@ -85,8 +84,10 @@
                   </div>
                 @endif
 
-                <p class="text-soft small flex-grow-1">{{ $team->description }}</p>
-
+                {{-- No spacer here. The description this card used to carry was
+                     dropped with the one-shot-event change, and it was what
+                     pushed the players toggle to the card's foot; keeping a
+                     flex-grow stand-in just held the same hole open. --}}
                 @if (count($team->member_list))
                   <a class="collapse-toggle" data-bs-toggle="collapse" href="#team-{{ $team->id }}"
                      role="button" aria-expanded="false" aria-controls="team-{{ $team->id }}">

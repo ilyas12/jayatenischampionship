@@ -1,15 +1,13 @@
 {{--
-    Squad avatar: the uploaded portrait, or a silhouette when there is none.
-
-    Shares the squad card's tennis-player silhouette so the two never drift
-    apart; the disc simply shows it smaller.
+    Squad avatar for the compact list: the uploaded portrait, or the illustrated
+    stand-in zoomed to the figure's upper body — at this size the full card
+    would be an unreadable blob.
 
     Expects $member (EventTeamMemberModel).
 --}}
 <span class="member-avatar">
-  @if ($member->photo_url)
-    <img src="{{ $member->photo_url }}" alt="{{ $member->name }}" loading="lazy">
-  @else
-    @include('tennis.partials.silhouette')
-  @endif
+  <img src="{{ $member->photo_url ?: $member->placeholder_photo_url }}"
+       alt="{{ $member->photo_url ? $member->name : '' }}"
+       class="{{ $member->photo_url ? '' : 'member-avatar__illustration' }}"
+       loading="lazy">
 </span>

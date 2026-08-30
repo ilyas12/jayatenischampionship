@@ -26,11 +26,17 @@ class EventTeamMemberModel extends Model
      */
     const PLACEHOLDERS = ['player-serve.jpg', 'player-forehand.jpg'];
 
-    public function getPlaceholderPhotoUrlAttribute()
+    /** Picks a stand-in from an id, so the choice is stable between renders. */
+    public static function placeholderFor($id)
     {
-        $file = self::PLACEHOLDERS[$this->id % count(self::PLACEHOLDERS)];
+        $file = self::PLACEHOLDERS[abs((int) $id) % count(self::PLACEHOLDERS)];
 
         return url('resources/assets/tennis/img/players/' . $file);
+    }
+
+    public function getPlaceholderPhotoUrlAttribute()
+    {
+        return self::placeholderFor($this->id);
     }
 
     /** Uploaded portrait only; callers fall back to the placeholder above. */
