@@ -3,6 +3,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Without this Docker builds the LAST stage in the Dockerfile, which is
+      # `production` — opcache on with validate_timestamps=0, so no source edit
+      # ever takes effect and every fix looks like it did nothing.
+      target: development
       args:
         # Bumped as the framework upgrade progresses toward Laravel 11 / PHP 8.2.
         PHP_VERSION: "${DOCKER_PHP_VERSION:-8.3}"

@@ -5,7 +5,11 @@
 #
 #   ./scripts/smoke-test.sh [base-url]
 #
-set -uo pipefail
+# No pipefail: several checks are `curl ... | grep -q`, and grep -q exits on the
+# first match, which SIGPIPEs curl. With pipefail that non-zero curl status
+# fails the whole pipeline, so a check reports "missing" precisely when the
+# thing it looks for appears early in a large response.
+set -u
 
 BASE="${1:-http://localhost:8088}"
 PASS=0
@@ -45,15 +49,34 @@ for path in "" rates branches news-and-events underlying contact; do
     expect "$BASE/$path" 200 "GET /$path"
 done
 
+# Grandstand Open — static slice of the tennis mockup.
+head_ "Tennis theme (/tennis)"
+for path in tennis tennis/teams tennis/draw tennis/registration; do
+    expect "$BASE/$path" 200 "GET /$path"
+done
+for asset in css/style.css js/main.js img/teams/src.svg; do
+    expect "$BASE/resources/assets/tennis/$asset" 200 "GET tennis asset $asset"
+done
+# The rules modal lives after </main> in the source and was missed by the first
+# extraction; assert it is actually on the page.
+if curl -s --max-time 30 "$BASE/tennis/registration" | grep -q 'id="rulesModal"'; then
+    ok "registration page includes the rules modal"
+else
+    bad "registration page is missing the rules modal"
+fi
+
 # Static theme sliced from the Swarnadwipa PSDs. It shares the layout and the
 # asset pipeline with nothing else, so a failure here is isolated to itself.
 head_ "Swarnadwipa theme (/home-new)"
 for path in home-new home-new/tentang home-new/donasi; do
     expect "$BASE/$path" 200 "GET /$path"
 done
-for asset in css/spd.css vendor/bootstrap/bootstrap.min.css images/logo.png images/hero.jpg; do
+for asset in css/spd.css images/logo.png images/hero.jpg; do
     expect "$BASE/resources/assets/spd/$asset" 200 "GET theme asset $asset"
 done
+# Bootstrap moved to a shared vendor dir once the tennis theme wanted the same
+# 5.3.3 build, so it is no longer under spd/.
+expect "$BASE/resources/assets/vendor/bootstrap/bootstrap.min.css" 200 "GET shared bootstrap"
 
 head_ "Dynamic content (proves the DB import and slug routing work)"
 DETAIL="$(curl -s --max-time 30 "$BASE/news-and-events" \

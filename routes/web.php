@@ -108,6 +108,10 @@ $router->group([
         Route::any('/google_analytics', array('as' => 'admin_ga', 'uses' => 'Setting@ga'));
         Route::any('/upload_logo', array('as' => 'admin_upload_logo', 'uses' => 'Setting@uploadlogo'));
         Route::any('/instagram_feed', array('as' => 'admin_instagram_feed', 'uses' => 'Setting@instagramfeed'));
+        // EVENT REGISTRATION
+        Route::any('/events', array('as' => 'admin_events', 'uses' => 'Events@index'));
+        Route::any('/event_registrations', array('as' => 'admin_event_registrations', 'uses' => 'EventRegistrations@index'));
+
         Route::any('/newsletter', array('as' => 'admin_newsletter', 'uses' => 'Newsletter@index'));
         Route::any('/social_link', array('as' => 'admin_social_link', 'uses' => 'SocialLink@index'));
         Route::any('/custom-menu', array('as' => 'admin_custom_menu', 'uses' => 'CustomMenu@index'));
@@ -139,6 +143,17 @@ $router->group([
     });
 
     Route::get('/', array('as' => 'home_terre', 'uses' => 'HomePage@index_dsv2'));
+    /**
+     * Grandstand Open — static slice of the tennis mockup, on its own prefix so
+     * it cannot collide with the live site's routes.
+     */
+    $router->group(['prefix' => 'tennis'], function ($router) {
+        Route::get('/', array('as' => 'tennis_home', 'uses' => 'Tennis@home'));
+        Route::get('/teams', array('as' => 'tennis_teams', 'uses' => 'Tennis@teams'));
+        Route::get('/draw', array('as' => 'tennis_bracket', 'uses' => 'Tennis@bracket'));
+        Route::get('/registration', array('as' => 'tennis_registration', 'uses' => 'Tennis@registration'));
+    });
+
     Route::get('/branches', array('as' => 'dev_branches', 'uses' => 'Stores@index_dsv2'));
     Route::get('/about', array('as' => 'dev_about', 'uses' => 'About@index_dsv2'));
     Route::get('/contact', array('as' => 'dev_contact', 'uses' => 'Contact@index_dsv2'));

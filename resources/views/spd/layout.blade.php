@@ -2,7 +2,7 @@
     Shared chrome for the Swarnadwipa theme, sliced from "WEB YAYASAN SPD.psd".
 
     Built on Bootstrap 5.3.3, vendored locally under
-    resources/assets/spd/vendor/bootstrap rather than pulled from a CDN, so the
+    resources/assets/vendor/bootstrap rather than pulled from a CDN, so the
     site has no third-party runtime dependency. Bootstrap supplies the grid,
     container and breakpoints; resources/assets/spd/css/spd.css supplies the
     palette and component skins taken from the PSD.
@@ -12,6 +12,11 @@
     once. Nothing outside resources/views/spd/ is affected.
 
     All copy is static, taken verbatim from the PSD's text layers.
+
+    Links use route() rather than hardcoded paths so they follow the routes
+    wherever they are mounted. The theme was first served under a /home-new
+    prefix and later moved to the site root; hardcoded url('home-new/...')
+    calls turned every nav and footer link into a 404 the moment it moved.
 --}}
 <!DOCTYPE html>
 <html lang="id">
@@ -34,7 +39,7 @@
     @endphp
 
     <link rel="shortcut icon" href="{{ asset('resources/assets/spd/images/logo.png') }}">
-    <link rel="stylesheet" href="{{ $spdAsset('resources/assets/spd/vendor/bootstrap/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ $spdAsset('resources/assets/vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ $spdAsset('resources/assets/spd/css/spd.css') }}">
 </head>
 <body class="spd">
@@ -51,7 +56,7 @@
                          and toggler instead of being squeezed in beside them. --}}
                     <div class="d-flex flex-wrap align-items-center w-100 gap-3">
 
-                        <a class="spd-logo" href="{{ url('home-new') }}">
+                        <a class="spd-logo" href="{{ route('spd_home') }}">
                             <img src="{{ asset('resources/assets/spd/images/logo.png') }}"
                                  alt="Yayasan Swarnadwipa Peduli Bangsa">
                         </a>
@@ -70,10 +75,10 @@
                             // Only the two pages in the PSD exist; the remaining
                             // nav items are in the design but have no page yet.
                             $spdNav = [
-                                ['label' => 'BERANDA',      'url' => url('home-new'),         'key' => 'beranda'],
-                                ['label' => 'TENTANG KAMI', 'url' => url('home-new/tentang'), 'key' => 'tentang'],
+                                ['label' => 'BERANDA',      'url' => route('spd_home'),         'key' => 'beranda'],
+                                ['label' => 'TENTANG KAMI', 'url' => route('spd_tentang'), 'key' => 'tentang'],
                                 ['label' => 'KEGIATAN',     'url' => null,                    'key' => 'kegiatan'],
-                                ['label' => 'DONASI',       'url' => url('home-new/donasi'),  'key' => 'donasi'],
+                                ['label' => 'DONASI',       'url' => route('spd_donasi'),  'key' => 'donasi'],
                                 ['label' => 'HUBUNGI KAMI', 'url' => null,                    'key' => 'hubungi'],
                             ];
                             $spdActive = $spdActive ?? null;
@@ -118,10 +123,10 @@
                 <div class="col-12 col-lg-4 spd-footer__sitemap">
                     <h2>PETA WEBSITE</h2>
                     <ul>
-                        <li><a href="{{ url('home-new') }}">BERANDA</a></li>
-                        <li><a href="{{ url('home-new/tentang') }}">TENTANG KAMI</a></li>
+                        <li><a href="{{ route('spd_home') }}">BERANDA</a></li>
+                        <li><a href="{{ route('spd_tentang') }}">TENTANG KAMI</a></li>
                         <li><a href="#">KEGIATAN</a></li>
-                        <li><a href="{{ url('home-new/donasi') }}">DONASI</a></li>
+                        <li><a href="{{ route('spd_donasi') }}">DONASI</a></li>
                         <li><a href="#">HUBUNGI KAMI</a></li>
                     </ul>
                 </div>
@@ -148,6 +153,6 @@
         </div>
     </footer>
 
-    <script src="{{ $spdAsset('resources/assets/spd/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ $spdAsset('resources/assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
 </body>
 </html>

@@ -13,6 +13,13 @@
         <div class="container">
             <div id="fade-menu" class="pull-left">
                 <ul class="nav navbar-nav dropdown">
+                    <li class="dropdown" {{ $page == "events" ? "class='active'" : '' }}>
+                        <a href="#">Events</a>
+                        <ul>
+                            <li><a href="{{ URL::route('admin_events') }}">Manage Events</a></li>
+                            <li><a href="{{ URL::route('admin_event_registrations') }}">Registrations</a></li>
+                        </ul>
+                    </li>
                     <li class="dropdown" {{ $page == "homepage" ? "class='active'" : '' }}>
                         <a href="#">Homepage</a>
                         <ul>
