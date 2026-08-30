@@ -49,40 +49,40 @@ expect_auth() { # url expected-code label
 
 head_ "Teams from the CMS"
 # The homepage carries a clubs strip that links into the teams page.
-if curl -s --max-time 30 "$BASE/tennis" | grep -qE 'club-tile|No clubs have entered'; then
+if curl -s --max-time 30 "$BASE/" | grep -qE 'club-tile|No clubs have entered'; then
     ok "homepage clubs strip renders or explains itself"
 else
     bad "homepage clubs strip missing"
 fi
 
-if curl -s --max-time 30 "$BASE/tennis/teams" | grep -q 'id="teamGrid"'; then
+if curl -s --max-time 30 "$BASE/teams" | grep -q 'id="teamGrid"'; then
     ok "teams grid renders"
 else
     bad "teams grid missing"
 fi
-if curl -s --max-time 30 "$BASE/tennis/teams" | grep -qE 'teamCount">[0-9]+'; then
+if curl -s --max-time 30 "$BASE/teams" | grep -qE 'teamCount">[0-9]+'; then
     ok "team count is rendered from the data"
 else
     bad "team count not rendered"
 fi
 
 # Cards link to a detail page keyed on the team's permalink.
-TEAM_URL="$(curl -s --max-time 30 "$BASE/tennis/teams" \
-    | grep -oE 'href="[^"]*/tennis/teams/[a-z0-9-]+"' | head -1 | sed 's/href="//;s/"$//')"
+TEAM_URL="$(curl -s --max-time 30 "$BASE/teams" \
+    | grep -oE 'href="[^"]*/teams/[a-z0-9-]+"' | head -1 | sed 's/href="//;s/"$//')"
 if [ -n "$TEAM_URL" ]; then
     case "$TEAM_URL" in http*) ;; *) TEAM_URL="$BASE$TEAM_URL" ;; esac
     expect "$TEAM_URL" 200 "team detail page"
 else
     bad "no team detail link on the teams page"
 fi
-expect "$BASE/tennis/teams/no-such-team" 404 "unknown team returns 404"
+expect "$BASE/teams/no-such-team" 404 "unknown team returns 404"
 
 # Draw and results read event_matches, but what they show depends on the event
 # phase — in registration there is deliberately no bracket. The page must still
 # be reachable and must explain itself rather than render blank.
 head_ "Draw and results"
-DRAW_BODY="$(curl -s --max-time 30 "$BASE/tennis/draw")"
-expect "$BASE/tennis/draw" 200 "draw page is reachable in every phase"
+DRAW_BODY="$(curl -s --max-time 30 "$BASE/draw")"
+expect "$BASE/draw" 200 "draw page is reachable in every phase"
 
 if printf '%s' "$DRAW_BODY" | grep -q 'class="round__title"'; then
     ok "bracket rounds render"
@@ -107,7 +107,7 @@ fi
 # Needs the grandstand-open-2026 event seeded; skips cleanly if it is not.
 head_ "Event registration flow"
 REG_COOKIES="$(mktemp)"
-REG_TOKEN="$(curl -s -c "$REG_COOKIES" --max-time 30 "$BASE/tennis/registration" \
+REG_TOKEN="$(curl -s -c "$REG_COOKIES" --max-time 30 "$BASE/registration" \
     | grep -oE 'name="_token" value="[^"]*"' | head -1 | sed 's/.*value="//;s/"//')"
 REG_LOC="$(curl -s -b "$REG_COOKIES" -c "$REG_COOKIES" -o /dev/null -w '%{redirect_url}' --max-time 30 \
     -X POST "$BASE/event/grandstand-open-2026/register" \
@@ -147,8 +147,8 @@ if [ -n "${REG_CODE:-}" ] && docker compose ps db >/dev/null 2>&1; then
 fi
 
 # Grandstand Open — static slice of the tennis mockup.
-head_ "Tennis theme (/tennis)"
-for path in tennis tennis/teams tennis/draw tennis/schedule tennis/registration; do
+head_ "Tennis site (site root)"
+for path in "" teams draw schedule registration; do
     expect "$BASE/$path" 200 "GET /$path"
 done
 for asset in css/style.css js/main.js img/teams/src.svg img/players/player-serve.jpg img/players/player-forehand.jpg; do
@@ -156,7 +156,7 @@ for asset in css/style.css js/main.js img/teams/src.svg img/players/player-serve
 done
 # The rules modal lives after </main> in the source and was missed by the first
 # extraction; assert it is actually on the page.
-if curl -s --max-time 30 "$BASE/tennis/registration" | grep -q 'id="rulesModal"'; then
+if curl -s --max-time 30 "$BASE/registration" | grep -q 'id="rulesModal"'; then
     ok "registration page includes the rules modal"
 else
     bad "registration page is missing the rules modal"
@@ -278,7 +278,7 @@ fi
 
 head_ "No PHP errors leaking into responses"
 LEAK=0
-for path in tennis tennis/teams tennis/draw tennis/schedule tennis/registration; do
+for path in "" teams draw schedule registration; do
     if curl -s --max-time 30 "$BASE/$path" \
         | grep -qiE "(Fatal error|Parse error|Warning</b>|Notice</b>|Whoops, looks like something went wrong|Deprecated:)"; then
         bad "/$path renders a PHP error or Whoops page"

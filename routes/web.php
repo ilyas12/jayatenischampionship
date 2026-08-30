@@ -132,50 +132,25 @@ $router->group([
 
 /**
  * FRONTEND ROUTES
+ *
+ * Jaya Tennis Championship, at the site root. The Dua Sisi money changer and
+ * Swarnadwipa themes that used to live here have been removed; the CMS beneath
+ * them — the admin panel and the event modules — is untouched.
  **/
 $router->group([
     'namespace' => 'Http\Controllers'
 ], function ($router) {
-    /**
-     * Swarnadwipa theme, sliced from "WEB YAYASAN SPD.psd". Static preview of
-     * the two designed pages; kept on its own prefix so it cannot affect the
-     * live site.
-     */
-    $router->group(['prefix' => 'home-new'], function ($router) {
-        Route::get('/', array('as' => 'spd_home', 'uses' => 'HomeNew@index'));
-        Route::get('/tentang', array('as' => 'spd_tentang', 'uses' => 'HomeNew@tentang'));
-        Route::get('/donasi', array('as' => 'spd_donasi', 'uses' => 'HomeNew@donasi'));
-    });
+    Route::get('/', array('as' => 'tennis_home', 'uses' => 'Tennis@home'));
+    Route::get('/schedule', array('as' => 'tennis_schedule', 'uses' => 'Tennis@schedule'));
+    Route::get('/teams', array('as' => 'tennis_teams', 'uses' => 'Tennis@teams'));
+    Route::get('/teams/{permalink}', array('as' => 'tennis_team', 'uses' => 'Tennis@team'));
+    Route::get('/draw', array('as' => 'tennis_bracket', 'uses' => 'Tennis@bracket'));
+    Route::get('/registration', array('as' => 'tennis_registration', 'uses' => 'Tennis@registration'));
 
-    Route::get('/', array('as' => 'home_terre', 'uses' => 'HomePage@index_dsv2'));
     /**
      * Event registration — generic, keyed by event slug and registration code.
      */
     Route::post('/event/{slug}/register', array('as' => 'event_register', 'uses' => 'EventRegistration@store'));
     Route::get('/event/payment/{code}', array('as' => 'event_payment', 'uses' => 'EventRegistration@confirm'));
     Route::post('/event/payment/{code}', array('as' => 'event_payment_upload', 'uses' => 'EventRegistration@upload'));
-
-    /**
-     * Grandstand Open — static slice of the tennis mockup, on its own prefix so
-     * it cannot collide with the live site's routes.
-     */
-    $router->group(['prefix' => 'tennis'], function ($router) {
-        Route::get('/', array('as' => 'tennis_home', 'uses' => 'Tennis@home'));
-        Route::get('/schedule', array('as' => 'tennis_schedule', 'uses' => 'Tennis@schedule'));
-        Route::get('/teams', array('as' => 'tennis_teams', 'uses' => 'Tennis@teams'));
-        Route::get('/teams/{permalink}', array('as' => 'tennis_team', 'uses' => 'Tennis@team'));
-        Route::get('/draw', array('as' => 'tennis_bracket', 'uses' => 'Tennis@bracket'));
-        Route::get('/registration', array('as' => 'tennis_registration', 'uses' => 'Tennis@registration'));
-    });
-
-    Route::get('/branches', array('as' => 'dev_branches', 'uses' => 'Stores@index_dsv2'));
-    Route::get('/about', array('as' => 'dev_about', 'uses' => 'About@index_dsv2'));
-    Route::get('/contact', array('as' => 'dev_contact', 'uses' => 'Contact@index_dsv2'));
-    Route::get('/complaint', array('as' => 'dev_complaint', 'uses' => 'Contact@index_dsv2'));
-    Route::get('/news-and-events', array('as' => 'dev_news_and_events', 'uses' => 'NewsAndEvent@index_dsv2'));
-    Route::get('/news-and-events/{id}', array('as' => 'dev_news_and_events_detail', 'uses' => 'NewsAndEvent@details_dsv2'));
-    Route::get('/underlying', array('as' => 'dev_underlying', 'uses' => 'NewsAndEvent@details_underlying'));
-    Route::post('/message', array('as' => 'message', 'uses' => 'Contact@message'));
-    Route::get('/rates', array('as' => 'dev_rates', 'uses' => 'HomePage@rates'));
-
 });
