@@ -31,10 +31,10 @@
 
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div class="filter-bar" role="group" aria-label="Choose a draw">
-          <button type="button" class="filter-btn is-active">Club Teams</button>
-          <button type="button" class="filter-btn">Men&rsquo;s Singles</button>
-          <button type="button" class="filter-btn">Women&rsquo;s Singles</button>
-          <button type="button" class="filter-btn">Doubles</button>
+          @foreach ($draws as $i => $draw)
+            <button type="button" class="filter-btn{{ $i === 0 ? ' is-active' : '' }}"
+                    data-draw="{{ $draw['key'] }}">{{ $draw['name'] }}</button>
+          @endforeach
         </div>
         <div class="legend">
           <span><b class="is-won"></b>Winner</span>
@@ -43,11 +43,11 @@
         </div>
       </div>
 
-      <!-- Blade: foreach (rounds as round) ... foreach (round->matches as match) ... -->
-      <div class="bracket-scroll">
+      @forelse ($draws as $i => $draw)
+      <div class="bracket-scroll" data-draw-panel="{{ $draw['key'] }}" @if ($i > 0) hidden @endif>
         <div class="bracket">
 
-          @forelse ($rounds as $round)
+          @forelse ($draw['rounds'] as $round)
             <div class="round">
               <div class="round__title">{{ $round['name'] }}</div>
               <div class="round__body">
@@ -78,7 +78,7 @@
             <p class="text-soft">The draw has not been published yet.</p>
           @endforelse
 
-          @if (count($rounds))
+          @if (count($draw['rounds']))
             {{-- Not a stored row: the champion is whoever won the last round. --}}
             <div class="round">
               <div class="round__title">Champion</div>
@@ -90,11 +90,11 @@
                       <path d="M7 5H4v1a4 4 0 0 0 3 3.9M17 5h3v1a4 4 0 0 1-3 3.9"/>
                       <path d="M12 13v5M8 21h8M10 18h4"/>
                     </svg>
-                    <div class="champion__name">{{ $champion ? $champion->name : 'To be decided' }}</div>
+                    <div class="champion__name">{{ $draw['champion'] ? $draw['champion']->name : 'To be decided' }}</div>
                     {{-- The final's own meta, not the event's closes_at: that is
                          when registration shuts, not when the final is played. --}}
-                    @if ($finalMatch && $finalMatch->meta)
-                      <div class="eyebrow eyebrow--muted mt-2 mb-0">{{ $finalMatch->meta }}</div>
+                    @if ($draw['finalMatch'] && $draw['finalMatch']->meta)
+                      <div class="eyebrow eyebrow--muted mt-2 mb-0">{{ $draw['finalMatch']->meta }}</div>
                     @endif
                   </div>
                 </div>
@@ -105,6 +105,9 @@
 
         </div>
       </div>
+      @empty
+        <p class="text-soft">The draw has not been published yet.</p>
+      @endforelse
 
     </div>
   </section>

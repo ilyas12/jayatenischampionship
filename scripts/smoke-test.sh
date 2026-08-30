@@ -70,6 +70,11 @@ if printf '%s' "$DRAW_BODY" | grep -q 'class="round__title"'; then
 else
     bad "bracket rounds missing"
 fi
+if printf '%s' "$DRAW_BODY" | grep -q 'data-draw-panel'; then
+    ok "draw renders a bracket panel per category"
+else
+    bad "draw category panels missing"
+fi
 if printf '%s' "$DRAW_BODY" | grep -q 'board__winner'; then
     ok "results board renders played ties"
 else

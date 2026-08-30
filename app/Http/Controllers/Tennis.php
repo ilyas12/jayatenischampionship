@@ -81,7 +81,41 @@ class Tennis extends Controller
                 ->orderBy('round')->orderBy('order_id')->orderBy('id')->get()
             : collect();
 
-        // One entry per column, in draw order.
+        $categories = EventCategoryModel::forEvent($event);
+
+        // One bracket per draw. Ties with no category are grouped under a
+        // fallback panel so nothing entered before categories existed vanishes.
+        $draws = $categories
+            ->map(function ($category) use ($matches) {
+                return $this->buildDraw(
+                    $category->code,
+                    $category->name,
+                    $matches->where('category_id', $category->id)
+                );
+            })
+            ->filter(function ($draw) { return $draw['rounds']->count(); })
+            ->values();
+
+        $uncategorised = $matches->whereNull('category_id');
+
+        if ($uncategorised->count()) {
+            $draws->push($this->buildDraw('all', 'All ties', $uncategorised));
+        }
+
+        return view('tennis.bracket', [
+            'tennisActive' => 'bracket',
+            'event'        => $event,
+            'draws'        => $draws,
+            // The board lists every played tie regardless of draw; the tabs
+            // choose a bracket, not a results filter.
+            'results'      => $matches->filter(function ($m) { return $m->winner_team_id; })
+                                      ->sortByDesc('round')->values(),
+        ]);
+    }
+
+    /** Group one draw's matches into rounds, and work out its champion. */
+    protected function buildDraw($key, $name, $matches)
+    {
         $rounds = $matches->groupBy('round')->map(function ($group) {
             return [
                 'name'    => $group->first()->round_name ?: 'Round ' . $group->first()->round,
@@ -89,21 +123,15 @@ class Tennis extends Controller
             ];
         })->values();
 
-        // The champion is the last round's winner, not a stored row.
         $finalMatch = $rounds->count() ? $rounds->last()['matches']->first() : null;
-        $champion   = optional($finalMatch)->winner;
 
-        return view('tennis.bracket', [
-            'tennisActive' => 'bracket',
-            'event'        => $event,
-            'rounds'       => $rounds,
-            'champion'     => $champion,
-            'finalMatch'   => $finalMatch,
-            // Results are the played ties, latest round first — not a separate
-            // table, so a score can only ever be entered once.
-            'results'      => $matches->filter(function ($m) { return $m->winner_team_id; })
-                                      ->sortByDesc('round')->values(),
-        ]);
+        return [
+            'key'        => $key,
+            'name'       => $name,
+            'rounds'     => $rounds,
+            'finalMatch' => $finalMatch,
+            'champion'   => optional($finalMatch)->winner,
+        ];
     }
 
     public function registration()

@@ -130,3 +130,25 @@
     });
   }
 })();
+
+  /* ---- Draw tabs ----------------------------------------------------------
+     One bracket per category; the tabs swap which panel is shown. Separate
+     from the teams-page [data-filter] handler, which hides cards inside a
+     single grid rather than switching panels. */
+  (function () {
+    var tabs = document.querySelectorAll('[data-draw]');
+    if (!tabs.length) return;
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var key = tab.getAttribute('data-draw');
+
+        tabs.forEach(function (t) { t.classList.remove('is-active'); });
+        tab.classList.add('is-active');
+
+        document.querySelectorAll('[data-draw-panel]').forEach(function (panel) {
+          panel.hidden = panel.getAttribute('data-draw-panel') !== key;
+        });
+      });
+    });
+  })();

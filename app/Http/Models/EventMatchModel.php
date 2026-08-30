@@ -9,14 +9,15 @@ class EventMatchModel extends Model
     protected $table = 'event_matches';
 
     protected $fillable = [
-        'event_id', 'round', 'round_name', 'label', 'meta', 'court',
+        'event_id', 'category_id', 'round', 'round_name', 'label', 'meta', 'court',
         'home_team_id', 'away_team_id', 'home_score', 'away_score',
         'winner_team_id', 'order_id', 'publish',
     ];
 
     protected $casts = ['publish' => 'boolean'];
 
-    public function event()  { return $this->belongsTo(EventModel::class, 'event_id'); }
+    public function event()    { return $this->belongsTo(EventModel::class, 'event_id'); }
+    public function category() { return $this->belongsTo(EventCategoryModel::class, 'category_id'); }
     public function home()   { return $this->belongsTo(EventTeamModel::class, 'home_team_id'); }
     public function away()   { return $this->belongsTo(EventTeamModel::class, 'away_team_id'); }
     public function winner() { return $this->belongsTo(EventTeamModel::class, 'winner_team_id'); }

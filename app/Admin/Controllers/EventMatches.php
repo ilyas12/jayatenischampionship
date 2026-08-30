@@ -3,6 +3,7 @@
 namespace terre\Admin\Controllers;
 
 use terre\Http\Models\EventMatchModel;
+use terre\Http\Models\EventCategoryModel;
 use terre\Http\Models\EventModel;
 use terre\Http\Models\EventTeamModel;
 
@@ -43,6 +44,18 @@ class EventMatches extends ScaffoldController
         return EventModel::orderBy('title')->pluck('title', 'id')->toArray();
     }
 
+    /** Draws to pick from, labelled with their event. */
+    protected function categoryOptions()
+    {
+        $options = ['' => '— none —'];
+
+        foreach (EventCategoryModel::with('event')->orderBy('order_id')->get() as $c) {
+            $options[$c->id] = optional($c->event)->title . ' — ' . $c->name;
+        }
+
+        return $options;
+    }
+
     /** Teams to pick from. Blank first so a slot can stay undecided. */
     protected function teamOptions()
     {
@@ -62,6 +75,11 @@ class EventMatches extends ScaffoldController
         ];
 
         $this->fields = [
+            [
+                'name'       => 'category_id',
+                'title'      => 'Draw',
+                'belongs_to' => ['category', 'name'],
+            ],
             ['name' => 'round', 'title' => 'Round', 'sort' => TRUE],
             ['name' => 'round_name', 'title' => 'Name', 'sort' => TRUE],
             ['name' => 'label', 'title' => 'Match'],
@@ -93,6 +111,13 @@ class EventMatches extends ScaffoldController
                 'type'       => 'select',
                 'option'     => $this->eventOptions(),
                 'validation' => 'required',
+            ],
+            [
+                'name'   => 'category_id',
+                'label'  => 'Draw',
+                'type'   => 'select',
+                'option' => $this->categoryOptions(),
+                'suffix' => 'Which draw this tie belongs to. Ties with no draw appear under "All" on the draw page.',
             ],
             [
                 'name'       => 'round',
