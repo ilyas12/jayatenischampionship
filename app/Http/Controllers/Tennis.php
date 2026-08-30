@@ -81,6 +81,10 @@ class Tennis extends Controller
             'rounds'       => $rounds,
             'champion'     => $champion,
             'finalMatch'   => $finalMatch,
+            // Results are the played ties, latest round first — not a separate
+            // table, so a score can only ever be entered once.
+            'results'      => $matches->filter(function ($m) { return $m->winner_team_id; })
+                                      ->sortByDesc('round')->values(),
         ]);
     }
 

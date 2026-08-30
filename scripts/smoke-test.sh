@@ -62,6 +62,20 @@ else
     bad "team count not rendered"
 fi
 
+# Draw and results both read event_matches.
+head_ "Draw and results"
+DRAW_BODY="$(curl -s --max-time 30 "$BASE/tennis/draw")"
+if printf '%s' "$DRAW_BODY" | grep -q 'class="round__title"'; then
+    ok "bracket rounds render"
+else
+    bad "bracket rounds missing"
+fi
+if printf '%s' "$DRAW_BODY" | grep -q 'board__winner'; then
+    ok "results board renders played ties"
+else
+    bad "results board empty"
+fi
+
 # Event registration flow, end to end: submit -> payment page -> proof upload.
 # Needs the grandstand-open-2026 event seeded; skips cleanly if it is not.
 head_ "Event registration flow"

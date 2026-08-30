@@ -106,7 +106,8 @@ class EventMatches extends ScaffoldController
                 'suffix' => 'Heading above the column, e.g. <code>Quarter-finals</code>.',
             ],
             ['name' => 'label', 'label' => 'Match Label', 'suffix' => 'e.g. <code>QF 1</code>.'],
-            ['name' => 'meta', 'label' => 'When / Where', 'suffix' => 'e.g. <code>Fri &middot; Centre</code>.'],
+            ['name' => 'meta', 'label' => 'When / Where', 'suffix' => 'Shown on the draw, e.g. <code>Fri &middot; Centre</code>.'],
+            ['name' => 'court', 'label' => 'Court', 'suffix' => 'Court column on the results board, e.g. <code>Centre</code>.'],
             [
                 'name'   => 'home_team_id',
                 'label'  => 'Home Team',

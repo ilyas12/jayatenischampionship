@@ -133,58 +133,20 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Blade: foreach (results as result) -->
-                  <tr>
-                    <td class="board__round">QF 1</td>
-                    <td>
-                      <span class="board__winner">Senayan Racquet</span>
-                      <span class="board__beat">def.</span>
-                      <span class="board__loser">Bandung Baseline</span>
-                    </td>
-                    <td class="board__score">6&ndash;4 6&ndash;2</td>
-                    <td class="board__court">Centre</td>
-                  </tr>
-                  <tr>
-                    <td class="board__round">QF 2</td>
-                    <td>
-                      <span class="board__winner">Surabaya Smash</span>
-                      <span class="board__beat">def.</span>
-                      <span class="board__loser">Kemang Court</span>
-                    </td>
-                    <td class="board__score">7&ndash;6 3&ndash;6 6&ndash;4</td>
-                    <td class="board__court">Court 1</td>
-                  </tr>
-                  <tr>
-                    <td class="board__round">QF 3</td>
-                    <td>
-                      <span class="board__winner">Bali Topspin</span>
-                      <span class="board__beat">def.</span>
-                      <span class="board__loser">Medan Ace</span>
-                    </td>
-                    <td class="board__score">6&ndash;3 6&ndash;4</td>
-                    <td class="board__court">Court 2</td>
-                  </tr>
-                  <tr>
-                    <td class="board__round">QF 4</td>
-                    <td>
-                      <span class="board__winner">Yogyakarta Volley</span>
-                      <span class="board__beat">def.</span>
-                      <span class="board__loser">Makassar Netcord</span>
-                    </td>
-                    <td class="board__score">6&ndash;1 6&ndash;7 7&ndash;5</td>
-                    <td class="board__court">Centre</td>
-                  </tr>
-                  <tr>
-                    <td class="board__round">SF 1</td>
-                    <td>
-                      <span class="board__winner">Senayan Racquet</span>
-                      <span class="board__beat">def.</span>
-                      <span class="board__loser">Surabaya Smash</span>
-                    </td>
-                    <td class="board__score">7&ndash;5 6&ndash;4</td>
-                    <td class="board__court">Centre</td>
-                  </tr>
-                    <!-- Blade: endforeach -->
+                    @forelse ($results as $result)
+                      <tr>
+                        <td class="board__round">{{ $result->label }}</td>
+                        <td>
+                          <span class="board__winner">{{ optional($result->winner)->name }}</span>
+                          <span class="board__beat">def.</span>
+                          <span class="board__loser">{{ optional($result->loser)->name ?: 'bye' }}</span>
+                        </td>
+                        <td class="board__score">{{ $result->result_score }}</td>
+                        <td class="board__court">{{ $result->court }}</td>
+                      </tr>
+                    @empty
+                      <tr><td colspan="4" class="text-soft">No results yet.</td></tr>
+                    @endforelse
                   </tbody>
                 </table>
               </div>

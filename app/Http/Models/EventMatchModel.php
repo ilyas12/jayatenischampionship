@@ -9,7 +9,7 @@ class EventMatchModel extends Model
     protected $table = 'event_matches';
 
     protected $fillable = [
-        'event_id', 'round', 'round_name', 'label', 'meta',
+        'event_id', 'round', 'round_name', 'label', 'meta', 'court',
         'home_team_id', 'away_team_id', 'home_score', 'away_score',
         'winner_team_id', 'order_id', 'publish',
     ];
@@ -37,5 +37,62 @@ class EventMatchModel extends Model
             'won'   => $team && $this->winner_team_id === $team->id,
             'tbd'   => ! $team,
         ];
+    }
+
+    /** Played ties, newest round first — what the results board lists. */
+    public function scopePlayed($query)
+    {
+        return $query->whereNotNull('winner_team_id');
+    }
+
+    /** The losing side, or null while the tie is undecided. */
+    public function getLoserAttribute()
+    {
+        if (! $this->winner_team_id) {
+            return null;
+        }
+
+        return $this->winner_team_id === $this->home_team_id ? $this->away : $this->home;
+    }
+
+    /**
+     * Set scores read from the winner's side: home "6 6" against away "4 2"
+     * becomes "6-4 6-2". Falls back to whatever was typed if the two sides do
+     * not have the same number of sets.
+     */
+    public function getResultScoreAttribute()
+    {
+        $winnerFirst = $this->winner_team_id === $this->home_team_id;
+        $win  = preg_split('/\s+/', trim((string) ($winnerFirst ? $this->home_score : $this->away_score)), -1, PREG_SPLIT_NO_EMPTY);
+        $lose = preg_split('/\s+/', trim((string) ($winnerFirst ? $this->away_score : $this->home_score)), -1, PREG_SPLIT_NO_EMPTY);
+
+        if (! $win || count($win) !== count($lose)) {
+            return trim($this->home_score . ' ' . $this->away_score);
+        }
+
+        $sets = [];
+        foreach ($win as $i => $game) {
+            $sets[] = $game . '-' . $lose[$i];
+        }
+
+        return implode(' ', $sets);
+    }
+
+    /**
+     * Court for the results board. Uses the column when set; otherwise falls
+     * back to the tail of `meta` ("Fri · Centre" -> "Centre") so rows entered
+     * before the column existed still show something.
+     */
+    public function getCourtAttribute($value)
+    {
+        if (! empty($value)) {
+            return $value;
+        }
+
+        $parts = preg_split('/\s*[·|]\s*/u', (string) $this->meta, -1, PREG_SPLIT_NO_EMPTY);
+        $tail  = $parts ? trim(end($parts)) : '';
+
+        // A time is not a court.
+        return preg_match('/^\d{1,2}[:.]\d{2}$/', $tail) ? '' : $tail;
     }
 }
