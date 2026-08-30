@@ -66,8 +66,12 @@ class EventTeamModel extends Model
     }
 
     /**
-     * Card image: the uploaded photo, else the placeholder crest for the team's
-     * short code, else the generic one.
+     * Card image: the uploaded photo, else the crest artwork matching the
+     * team's short code, else null.
+     *
+     * Null rather than the CMS's generic none.png, which renders the words
+     * "No Image" on a public page. A team created from a registration has no
+     * crest file, so the templates draw a placeholder instead.
      */
     public function getPhotoUrlAttribute()
     {
@@ -76,11 +80,12 @@ class EventTeamModel extends Model
         }
 
         $code = strtolower((string) $this->short_code);
-        $svg  = base_path('resources/assets/tennis/img/teams/' . $code . '.svg');
 
-        return file_exists($svg) && $code !== ''
-            ? url('resources/assets/tennis/img/teams/' . $code . '.svg')
-            : url('resources/assets/images/none.png');
+        if ($code === '' || ! file_exists(base_path('resources/assets/tennis/img/teams/' . $code . '.svg'))) {
+            return null;
+        }
+
+        return url('resources/assets/tennis/img/teams/' . $code . '.svg');
     }
 
     /** The value the front-end filter buttons match on. */

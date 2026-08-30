@@ -2,9 +2,10 @@
     Stand-in for a squad portrait: a tennis player mid-serve rather than a
     generic profile bust, so an unphotographed player still reads as a player.
 
-    Inline SVG, single colour, no external request. Sized by its container.
+    Inline SVG, single colour, no external request. Sized by whichever
+    container it sits in — the squad card's portrait or the list's small disc.
 --}}
-<svg class="squad-card__silhouette" viewBox="0 0 60 80" aria-hidden="true" focusable="false">
+<svg class="tennis-silhouette" viewBox="0 0 60 80" aria-hidden="true" focusable="false">
   <g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
     <path d="M28 27 L30 45"/>
     <path d="M28 29 L40 20"/>

@@ -455,8 +455,8 @@ a:hover{ color:var(--purple); }
 
 .member-avatar {
   flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   overflow: hidden;
   display: inline-flex;
@@ -469,7 +469,9 @@ a:hover{ color:var(--purple); }
 
 /* Silhouette sits slightly muted so a real portrait always reads as the
    stronger element in a mixed list. */
-.member-avatar__silhouette { width: 100%; height: 100%; fill: currentColor; opacity: .32; }
+/* The same figure in the list's small disc. Height-fitted rather than
+   stretched, since the silhouette is 3:4 and the disc is round. */
+.member-avatar .tennis-silhouette { height: 78%; width: auto; opacity: .4; }
 
 .member-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -585,7 +587,7 @@ a:hover{ color:var(--purple); }
 }
 
 .squad-card__photo img { width: 100%; height: 100%; object-fit: cover; }
-.squad-card__silhouette { width: 62%; height: 62%; color: #0A4A2A; opacity: .26; }
+.squad-card__photo .tennis-silhouette { width: 62%; height: 62%; color: #0A4A2A; opacity: .26; }
 
 .squad-card__body { padding: .85rem .95rem 1rem; }
 .squad-card__name { margin: 0; font-size: 1rem; line-height: 1.25; }
@@ -596,3 +598,17 @@ a:hover{ color:var(--purple); }
   .team-fact + .team-fact { border-left: 0; padding-left: 0; }
   .team-facts__grid { grid-template-columns: repeat(2, 1fr); gap: 0 1rem; }
 }
+
+/* A team with no crest artwork and no upload — a club that came in through the
+   entry form — gets the same silhouette treatment as an unphotographed player,
+   rather than the CMS's generic "No Image" graphic. */
+.team-card__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #F4F1EA;
+}
+
+.team-card__placeholder .tennis-silhouette { height: 62%; width: auto; color: #0A4A2A; opacity: .22; }

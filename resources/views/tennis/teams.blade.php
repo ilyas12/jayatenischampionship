@@ -35,10 +35,10 @@
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-5">
         <div class="filter-bar" role="group" aria-label="Filter teams by group">
           <button type="button" class="filter-btn is-active" data-filter="all">All teams</button>
-          @foreach ($groups as $group)
+          @foreach (($event && $event->showsSeeding()) ? $groups : collect() as $group)
             <button type="button" class="filter-btn" data-filter="{{ strtolower($group) }}">Group {{ strtoupper($group) }}</button>
           @endforeach
-          @if ($teams->contains('qualified', true))
+          @if ($event && $event->showsSeeding() && $teams->contains('qualified', true))
             <button type="button" class="filter-btn" data-filter="qualified">Qualified</button>
           @endif
         </div>
@@ -52,8 +52,14 @@
             <article class="card-flat team-card">
               <figure class="team-card__photo">
                 <a href="{{ route('tennis_team', $team->permalink) }}">
-                  <img src="{{ $team->photo_url }}" alt="{{ $team->name }} squad"
-                       width="720" height="480" loading="lazy">
+                  @if ($team->photo_url)
+                    <img src="{{ $team->photo_url }}" alt="{{ $team->name }} squad"
+                         width="720" height="480" loading="lazy">
+                  @else
+                    <span class="team-card__placeholder">
+                      @include('tennis.partials.silhouette')
+                    </span>
+                  @endif
                 </a>
                 @if ($team->short_code)
                   <span class="crest">{{ $team->short_code }}</span>
@@ -70,7 +76,9 @@
                   </div>
                 </div>
 
-                @if ($team->seed || $team->team_group)
+                {{-- Seeding is set when the draw is made; before that the
+                     detail page hides it too, so the two must agree. --}}
+                @if ($event && $event->showsSeeding() && ($team->seed || $team->team_group))
                   <div class="mb-3">
                     @if ($team->seed)<span class="tag tag--purple">Seed {{ $team->seed }}</span>@endif
                     @if ($team->team_group)<span class="tag">Group {{ strtoupper($team->team_group) }}</span>@endif
