@@ -19,17 +19,36 @@ use terre\Http\Models\EventTeamModel;
  */
 class Tennis extends Controller
 {
+    /** Published teams for an event, in display order. */
+    protected function teamsFor($event)
+    {
+        return $event
+            ? EventTeamModel::where('event_id', $event->id)->where('publish', 1)
+                ->orderBy('order_id')->orderBy('name')->get()
+            : collect();
+    }
+
     public function home()
     {
         $event = EventModel::current();
 
+        $teams = $this->teamsFor($event);
+
+        $schedule = $event
+            ? EventScheduleModel::where('event_id', $event->id)->where('publish', 1)
+                ->orderBy('starts_on')->orderBy('order_id')->get()
+            : collect();
+
         return view('tennis.home', [
             'tennisActive' => 'home',
             'event'        => $event,
-            'schedule'     => $event
-                ? EventScheduleModel::where('event_id', $event->id)->where('publish', 1)
-                    ->orderBy('starts_on')->orderBy('order_id')->get()
-                : collect(),
+            'schedule'     => $schedule,
+            // Hero counters. Categories stays as designed: nothing stores the
+            // list of draws an event offers, and counting the categories that
+            // happen to have entries would answer a different question.
+            'clubCount'    => $teams->count(),
+            'playerCount'  => $teams->sum(function ($team) { return count($team->member_list); }),
+            'dayCount'     => $schedule->pluck('starts_on')->filter()->unique()->count(),
         ]);
     }
 
@@ -39,10 +58,7 @@ class Tennis extends Controller
         // grid rather than another event's entries.
         $event = EventModel::current();
 
-        $teams = $event
-            ? EventTeamModel::where('event_id', $event->id)->where('publish', 1)
-                ->orderBy('order_id')->orderBy('name')->get()
-            : collect();
+        $teams = $this->teamsFor($event);
 
         return view('tennis.teams', [
             'tennisActive' => 'teams',

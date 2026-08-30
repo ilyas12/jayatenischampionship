@@ -23,10 +23,10 @@
 
           <div class="hero__meta">
             <div class="row g-4">
-              <div class="col-6 col-sm-3"><div class="hero__stat"><b>128</b><span>Players</span></div></div>
-              <div class="col-6 col-sm-3"><div class="hero__stat"><b>16</b><span>Clubs</span></div></div>
+              <div class="col-6 col-sm-3"><div class="hero__stat"><b>{{ $playerCount }}</b><span>Players</span></div></div>
+              <div class="col-6 col-sm-3"><div class="hero__stat"><b>{{ $clubCount }}</b><span>Clubs</span></div></div>
               <div class="col-6 col-sm-3"><div class="hero__stat"><b>6</b><span>Categories</span></div></div>
-              <div class="col-6 col-sm-3"><div class="hero__stat"><b>8</b><span>Days</span></div></div>
+              <div class="col-6 col-sm-3"><div class="hero__stat"><b>{{ $dayCount }}</b><span>Days</span></div></div>
             </div>
           </div>
         </div>
