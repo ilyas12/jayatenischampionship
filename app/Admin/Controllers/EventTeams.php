@@ -116,7 +116,6 @@ class EventTeams extends ScaffoldController
                 'path'  => base_path('resources/assets/uploads/event_teams/'),
                 'suffix' => 'Optional. Falls back to the placeholder crest.',
             ],
-            ['name' => 'description', 'label' => 'Description', 'type' => 'textarea'],
             ['name' => 'seed', 'label' => 'Seed', 'validation' => 'nullable|integer'],
             [
                 'name'   => 'team_group',

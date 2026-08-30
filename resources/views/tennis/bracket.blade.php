@@ -106,7 +106,7 @@
         </div>
       </div>
       @empty
-        <p class="text-soft">The draw has not been published yet.</p>
+        @include('tennis.partials.phase-notice', ['what' => 'draw'])
       @endforelse
 
     </div>
@@ -149,7 +149,9 @@
                         <td class="board__court">{{ $result->court }}</td>
                       </tr>
                     @empty
-                      <tr><td colspan="4" class="text-soft">No results yet.</td></tr>
+                      <tr><td colspan="4">
+                        @include('tennis.partials.phase-notice', ['what' => 'results'])
+                      </td></tr>
                     @endforelse
                   </tbody>
                 </table>
@@ -157,7 +159,7 @@
             </div>
           </div>
           @empty
-            <p class="text-soft">No results yet.</p>
+            @include('tennis.partials.phase-notice', ['what' => 'results'])
           @endforelse
         </div>
       </div>

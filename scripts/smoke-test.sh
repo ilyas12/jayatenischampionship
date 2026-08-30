@@ -73,23 +73,30 @@ else
 fi
 expect "$BASE/tennis/teams/no-such-team" 404 "unknown team returns 404"
 
-# Draw and results both read event_matches.
+# Draw and results read event_matches, but what they show depends on the event
+# phase — in registration there is deliberately no bracket. The page must still
+# be reachable and must explain itself rather than render blank.
 head_ "Draw and results"
 DRAW_BODY="$(curl -s --max-time 30 "$BASE/tennis/draw")"
+expect "$BASE/tennis/draw" 200 "draw page is reachable in every phase"
+
 if printf '%s' "$DRAW_BODY" | grep -q 'class="round__title"'; then
     ok "bracket rounds render"
+    if printf '%s' "$DRAW_BODY" | grep -q 'data-draw-panel'; then
+        ok "draw renders a bracket panel per category"
+    else
+        bad "draw category panels missing"
+    fi
+elif printf '%s' "$DRAW_BODY" | grep -q 'phase-notice'; then
+    ok "no draw yet — the page explains the phase instead of rendering blank"
 else
-    bad "bracket rounds missing"
+    bad "draw page has neither a bracket nor a phase notice"
 fi
-if printf '%s' "$DRAW_BODY" | grep -q 'data-draw-panel'; then
-    ok "draw renders a bracket panel per category"
+
+if printf '%s' "$DRAW_BODY" | grep -qE 'board__winner|phase-notice'; then
+    ok "results board shows played ties or says why it is empty"
 else
-    bad "draw category panels missing"
-fi
-if printf '%s' "$DRAW_BODY" | grep -q 'board__winner'; then
-    ok "results board renders played ties"
-else
-    bad "results board empty"
+    bad "results board is blank with no explanation"
 fi
 
 # Event registration flow, end to end: submit -> payment page -> proof upload.

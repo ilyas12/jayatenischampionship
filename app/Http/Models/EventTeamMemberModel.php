@@ -8,7 +8,7 @@ class EventTeamMemberModel extends Model
 {
     protected $table = 'event_team_members';
 
-    protected $fillable = ['team_id', 'name', 'role', 'rank', 'photo', 'order_id', 'publish'];
+    protected $fillable = ['team_id', 'name', 'role', 'rank', 'bio', 'photo', 'order_id', 'publish'];
 
     protected $casts = ['publish' => 'boolean'];
 

@@ -64,6 +64,7 @@ class Tennis extends Controller
 
         return view('tennis.teams', [
             'tennisActive' => 'teams',
+            'phase'        => optional($event)->phase,
             'event'        => $event,
             'teams'        => $teams,
             'groups'       => $teams->pluck('team_group')->filter()->unique()->sort()->values(),
@@ -86,7 +87,9 @@ class Tennis extends Controller
             'tennisActive' => 'teams',
             'event'        => $event,
             'team'         => $team,
-            'matches'      => $team->matches(),
+            // Before the draw exists a team has no ties; the page shows its
+            // squad and says so rather than rendering an empty table.
+            'matches'      => ($event && $event->showsDraw()) ? $team->matches() : collect(),
         ]);
     }
 
@@ -94,22 +97,22 @@ class Tennis extends Controller
     {
         $event = EventModel::current();
 
-        $matches = $event
-            ? EventMatchModel::with(['home', 'away', 'winner'])
+        // The page always exists. Before the draw is published there is simply
+        // nothing to show, which is a state the template handles rather than a
+        // reason to hide the route or the nav item.
+        $matches = ($event && $event->showsDraw())
+            ? EventMatchModel::with(['home', 'away', 'winner', 'category'])
                 ->where('event_id', $event->id)->where('publish', 1)
                 ->orderBy('round')->orderBy('order_id')->orderBy('id')->get()
             : collect();
 
-        $categories = EventCategoryModel::forEvent($event);
-
-        // One bracket per draw. Ties with no category are grouped under a
-        // fallback panel so nothing entered before categories existed vanishes.
-        $draws = $categories
-            ->map(function ($category) use ($matches) {
+        $draws = EventCategoryModel::forEvent($event)
+            ->map(function ($category) use ($matches, $event) {
                 return $this->buildDraw(
                     $category->code,
                     $category->name,
-                    $matches->where('category_id', $category->id)
+                    $matches->where('category_id', $category->id),
+                    $event
                 );
             })
             ->filter(function ($draw) { return $draw['rounds']->count(); })
@@ -118,7 +121,7 @@ class Tennis extends Controller
         $uncategorised = $matches->whereNull('category_id');
 
         if ($uncategorised->count()) {
-            $draws->push($this->buildDraw('all', 'All ties', $uncategorised));
+            $draws->push($this->buildDraw('all', 'All ties', $uncategorised, $event));
         }
 
         return view('tennis.bracket', [
@@ -129,7 +132,7 @@ class Tennis extends Controller
     }
 
     /** Group one draw's matches into rounds, and work out its champion. */
-    protected function buildDraw($key, $name, $matches)
+    protected function buildDraw($key, $name, $matches, $event = null)
     {
         $rounds = $matches->groupBy('round')->map(function ($group) {
             return [
@@ -144,9 +147,12 @@ class Tennis extends Controller
             'key'        => $key,
             'name'       => $name,
             'rounds'     => $rounds,
-            // This draw's played ties, latest round first.
-            'results'    => $matches->filter(function ($m) { return $m->winner_team_id; })
-                                    ->sortByDesc('round')->values(),
+            // Results only once the event is actually being played; before
+            // that a scored tie in the database is test data, not news.
+            'results'    => ($event && $event->showsResults())
+                ? $matches->filter(function ($m) { return $m->winner_team_id; })
+                          ->sortByDesc('round')->values()
+                : collect(),
             'finalMatch' => $finalMatch,
             'champion'   => optional($finalMatch)->winner,
         ];

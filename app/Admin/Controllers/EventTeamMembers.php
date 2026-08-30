@@ -105,6 +105,12 @@ class EventTeamMembers extends ScaffoldController
             ],
             ['name' => 'role', 'label' => 'Role', 'suffix' => 'Captain, Player, Reserve, Coach.'],
             ['name' => 'rank', 'label' => 'Rank', 'suffix' => 'National ranking, shown as #12.'],
+            [
+                'name'   => 'bio',
+                'label'  => 'Short Description',
+                'type'   => 'textarea',
+                'suffix' => 'One or two lines about the player. Omitted from the card when empty.',
+            ],
             ['name' => 'order_id', 'label' => 'Order', 'validation' => 'nullable|integer'],
             [
                 'name'   => 'publish',

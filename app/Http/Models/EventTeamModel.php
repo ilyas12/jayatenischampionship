@@ -9,8 +9,7 @@ class EventTeamModel extends Model
     protected $table = 'event_teams';
 
     protected $fillable = [
-        'event_id', 'registration_id', 'name', 'permalink', 'short_code', 'city', 'founded', 'photo',
-        'description', 'seed', 'team_group', 'qualified',
+        'event_id', 'registration_id', 'name', 'permalink', 'short_code', 'city', 'founded', 'photo', 'seed', 'team_group', 'qualified',
         'order_id', 'publish',
     ];
 

@@ -60,6 +60,7 @@ class Events extends ScaffoldController
                 'sort'   => TRUE,
                 'prefix' => 'Rp ',
             ],
+            ['name' => 'phase', 'title' => 'Phase', 'sort' => TRUE],
             [
                 'name'  => 'opens_at',
                 'title' => 'Opens',
@@ -118,6 +119,14 @@ class Events extends ScaffoldController
                 'name'  => 'closes_at',
                 'label' => 'Registration Closes',
                 'type'  => 'datepicker',
+            ],
+            [
+                'name'       => 'phase',
+                'label'      => 'Phase',
+                'type'       => 'select',
+                'option'     => \terre\Http\Models\EventModel::phaseOptions(),
+                'validation' => 'required',
+                'suffix'     => 'Drives what the public site shows. Entries are only accepted in Registration, and only while the dates below allow it.',
             ],
             [
                 'name'  => 'publish',
