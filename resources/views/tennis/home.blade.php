@@ -114,48 +114,18 @@
           <p class="lede mt-3">Gates open one hour before the first match. Order of play is confirmed at 18:00 the evening prior.</p>
         </div>
         <div class="col-lg-8">
-          <!-- foreach (schedule as day) -->
-          <div class="schedule-row">
-            <div class="schedule-row__date">Mon 12 Oct</div>
-            <div>
-              <strong>Qualifying rounds</strong>
-              <div class="text-soft">All courts &middot; 08:00 &ndash; 18:00</div>
+          @forelse ($schedule as $day)
+            <div class="schedule-row">
+              <div class="schedule-row__date">{{ $day->date_label }}</div>
+              <div>
+                <strong>{{ $day->title }}</strong>
+                @if ($day->detail)<div class="text-soft">{{ $day->detail }}</div>@endif
+              </div>
+              <div class="schedule-row__note">{{ $day->note }}</div>
             </div>
-            <div class="schedule-row__note">Free entry</div>
-          </div>
-          <div class="schedule-row">
-            <div class="schedule-row__date">Wed 14 Oct</div>
-            <div>
-              <strong>Main draw &mdash; first round</strong>
-              <div class="text-soft">Centre &amp; Court 1 &middot; 10:00</div>
-            </div>
-            <div class="schedule-row__note">Ticketed</div>
-          </div>
-          <div class="schedule-row">
-            <div class="schedule-row__date">Fri 16 Oct</div>
-            <div>
-              <strong>Quarter-finals</strong>
-              <div class="text-soft">Centre Court &middot; 13:00</div>
-            </div>
-            <div class="schedule-row__note">Ticketed</div>
-          </div>
-          <div class="schedule-row">
-            <div class="schedule-row__date">Sat 17 Oct</div>
-            <div>
-              <strong>Semi-finals &amp; club team finals</strong>
-              <div class="text-soft">Centre Court &middot; 14:00</div>
-            </div>
-            <div class="schedule-row__note">Ticketed</div>
-          </div>
-          <div class="schedule-row">
-            <div class="schedule-row__date">Sun 19 Oct</div>
-            <div>
-              <strong>Finals &amp; presentation</strong>
-              <div class="text-soft">Centre Court &middot; 15:00</div>
-            </div>
-            <div class="schedule-row__note">Sold out</div>
-          </div>
-          <!-- endforeach -->
+          @empty
+            <p class="text-soft">The order of play has not been published yet.</p>
+          @endforelse
         </div>
       </div>
     </div>

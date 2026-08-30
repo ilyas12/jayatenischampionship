@@ -3,6 +3,7 @@
 namespace terre\Http\Controllers;
 
 use terre\Http\Models\EventModel;
+use terre\Http\Models\EventScheduleModel;
 use terre\Http\Models\EventTeamModel;
 
 /**
@@ -19,7 +20,16 @@ class Tennis extends Controller
 {
     public function home()
     {
-        return view('tennis.home', ['tennisActive' => 'home']);
+        $event = EventModel::current();
+
+        return view('tennis.home', [
+            'tennisActive' => 'home',
+            'event'        => $event,
+            'schedule'     => $event
+                ? EventScheduleModel::where('event_id', $event->id)->where('publish', 1)
+                    ->orderBy('starts_on')->orderBy('order_id')->get()
+                : collect(),
+        ]);
     }
 
     public function teams()
