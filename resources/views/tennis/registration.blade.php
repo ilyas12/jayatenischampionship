@@ -58,12 +58,10 @@
                 <!-- Blade: foreach (categories as c) <option value=" c->id " selected(old('category_id') == c->id)> c->name </option> endforeach -->
                 <select class="form-select" id="category" name="category_id" required>
                   <option value="" selected disabled>Choose a category&hellip;</option>
-                  <option value="ms">Men&rsquo;s Singles</option>
-                  <option value="ws">Women&rsquo;s Singles</option>
-                  <option value="md">Men&rsquo;s Doubles</option>
-                  <option value="wd">Women&rsquo;s Doubles</option>
-                  <option value="xd">Mixed Doubles</option>
-                  <option value="ct">Club Teams</option>
+                  @foreach ($categories as $category)
+                    <option value="{{ $category->code }}"
+                            @if (old('category_id') === $category->code) selected @endif>{{ $category->name }}</option>
+                  @endforeach
                 </select>
                 <div class="invalid-feedback">Please choose a category.</div>
               </div>

@@ -3,6 +3,7 @@
 namespace terre\Http\Controllers;
 
 use terre\Http\Models\EventModel;
+use terre\Http\Models\EventCategoryModel;
 use terre\Http\Models\EventMatchModel;
 use terre\Http\Models\EventScheduleModel;
 use terre\Http\Models\EventTeamModel;
@@ -34,6 +35,8 @@ class Tennis extends Controller
 
         $teams = $this->teamsFor($event);
 
+        $categories = EventCategoryModel::forEvent($event);
+
         $schedule = $event
             ? EventScheduleModel::where('event_id', $event->id)->where('publish', 1)
                 ->orderBy('starts_on')->orderBy('order_id')->get()
@@ -43,9 +46,8 @@ class Tennis extends Controller
             'tennisActive' => 'home',
             'event'        => $event,
             'schedule'     => $schedule,
-            // Hero counters. Categories stays as designed: nothing stores the
-            // list of draws an event offers, and counting the categories that
-            // happen to have entries would answer a different question.
+            'categories'   => $categories,
+            // Hero counters, all from the event's own data.
             'clubCount'    => $teams->count(),
             'playerCount'  => $teams->sum(function ($team) { return count($team->member_list); }),
             'dayCount'     => $schedule->pluck('starts_on')->filter()->unique()->count(),
@@ -108,9 +110,12 @@ class Tennis extends Controller
     {
         // Whichever event is open, rather than a slug baked into the form.
         // Null renders the closed state instead of a form posting to a 404.
+        $event = EventModel::current();
+
         return view('tennis.registration', [
             'tennisActive' => 'registration',
-            'event'        => EventModel::current(),
+            'event'        => $event,
+            'categories'   => EventCategoryModel::forEvent($event),
         ]);
     }
 }

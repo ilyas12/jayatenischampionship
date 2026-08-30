@@ -25,7 +25,7 @@
             <div class="row g-4">
               <div class="col-6 col-sm-3"><div class="hero__stat"><b>{{ $playerCount }}</b><span>Players</span></div></div>
               <div class="col-6 col-sm-3"><div class="hero__stat"><b>{{ $clubCount }}</b><span>Clubs</span></div></div>
-              <div class="col-6 col-sm-3"><div class="hero__stat"><b>6</b><span>Categories</span></div></div>
+              <div class="col-6 col-sm-3"><div class="hero__stat"><b>{{ $categories->count() }}</b><span>Categories</span></div></div>
               <div class="col-6 col-sm-3"><div class="hero__stat"><b>{{ $dayCount }}</b><span>Days</span></div></div>
             </div>
           </div>
@@ -48,7 +48,7 @@
       <div class="row g-5">
         <div class="col-lg-4">
           <span class="eyebrow">Events</span>
-          <h2>Six draws,<br>one champion each.</h2>
+          <h2>{{ $categories->count() }} draw{{ $categories->count() === 1 ? '' : 's' }},<br>one champion each.</h2>
           <p class="lede mt-3">
             Entry closes when a draw is full. Seeding follows the national ranking list
             published two weeks before the first ball.
@@ -56,48 +56,25 @@
         </div>
         <div class="col-lg-8">
           <div class="row g-4">
-            <!-- foreach (categories as category) -->
-            <div class="col-md-6">
-              <article class="card-flat">
-                <div class="card-body">
-                  <div class="numbered">01</div>
-                  <h3 class="mt-3">Men&rsquo;s Singles</h3>
-                  <p class="text-soft mb-3">Best of three sets, championship tie-break in the deciding set.</p>
-                  <span class="tag">Draw of 32</span> <span class="tag tag--purple">Open</span>
-                </div>
-              </article>
-            </div>
-            <div class="col-md-6">
-              <article class="card-flat">
-                <div class="card-body">
-                  <div class="numbered">02</div>
-                  <h3 class="mt-3">Women&rsquo;s Singles</h3>
-                  <p class="text-soft mb-3">Best of three sets, championship tie-break in the deciding set.</p>
-                  <span class="tag">Draw of 32</span> <span class="tag tag--purple">Open</span>
-                </div>
-              </article>
-            </div>
-            <div class="col-md-6">
-              <article class="card-flat">
-                <div class="card-body">
-                  <div class="numbered">03</div>
-                  <h3 class="mt-3">Doubles</h3>
-                  <p class="text-soft mb-3">Men&rsquo;s, women&rsquo;s and mixed pairs. No-ad scoring throughout.</p>
-                  <span class="tag">Draw of 16</span> <span class="tag tag--purple">Open</span>
-                </div>
-              </article>
-            </div>
-            <div class="col-md-6">
-              <article class="card-flat">
-                <div class="card-body">
-                  <div class="numbered">04</div>
-                  <h3 class="mt-3">Club Teams</h3>
-                  <p class="text-soft mb-3">Four to eight players per club. Two singles and one doubles per tie.</p>
-                  <span class="tag">Draw of 8</span> <span class="tag tag--ink">4 places left</span>
-                </div>
-              </article>
-            </div>
-            <!-- endforeach -->
+            @forelse ($categories as $i => $category)
+              <div class="col-md-6">
+                <article class="card-flat">
+                  <div class="card-body">
+                    <div class="numbered">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</div>
+                    <h3 class="mt-3">{{ $category->name }}</h3>
+                    <p class="text-soft mb-3">{{ $category->description }}</p>
+                    @if ($category->draw_size)
+                      <span class="tag">Draw of {{ $category->draw_size }}</span>
+                    @endif
+                    @if ($category->status_label)
+                      <span class="tag tag--purple">{{ $category->status_label }}</span>
+                    @endif
+                  </div>
+                </article>
+              </div>
+            @empty
+              <p class="text-soft">No draws have been published for this event yet.</p>
+            @endforelse
           </div>
         </div>
       </div>
