@@ -100,6 +100,7 @@ class EventTeams extends ScaffoldController
                 'name'       => 'name',
                 'label'      => 'Team Name',
                 'validation' => 'required',
+                'permalink'  => 'permalink',
             ],
             [
                 'name'   => 'short_code',

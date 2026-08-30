@@ -51,15 +51,19 @@
           <div class="col-md-6 col-xl-4" data-group="{{ $team->filter_key }}">
             <article class="card-flat team-card">
               <figure class="team-card__photo">
-                <img src="{{ $team->photo_url }}" alt="{{ $team->name }} squad"
-                     width="720" height="480" loading="lazy">
+                <a href="{{ route('tennis_team', $team->permalink) }}">
+                  <img src="{{ $team->photo_url }}" alt="{{ $team->name }} squad"
+                       width="720" height="480" loading="lazy">
+                </a>
                 @if ($team->short_code)
                   <span class="crest">{{ $team->short_code }}</span>
                 @endif
               </figure>
               <div class="card-body d-flex flex-column h-100">
                 <div class="team-card__head mb-3">
-                  <h3 class="h5 mb-1">{{ $team->name }}</h3>
+                  <h3 class="h5 mb-1">
+                    <a href="{{ route('tennis_team', $team->permalink) }}">{{ $team->name }}</a>
+                  </h3>
                   <div class="text-soft small">
                     {{ $team->city }}@if ($team->city && $team->founded) &middot; @endif
                     @if ($team->founded) est. {{ $team->founded }} @endif

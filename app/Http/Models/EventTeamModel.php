@@ -9,7 +9,7 @@ class EventTeamModel extends Model
     protected $table = 'event_teams';
 
     protected $fillable = [
-        'event_id', 'registration_id', 'name', 'short_code', 'city', 'founded', 'photo',
+        'event_id', 'registration_id', 'name', 'permalink', 'short_code', 'city', 'founded', 'photo',
         'description', 'seed', 'team_group', 'qualified', 'members',
         'order_id', 'publish',
     ];
@@ -22,6 +22,18 @@ class EventTeamModel extends Model
     public function event()
     {
         return $this->belongsTo(EventModel::class, 'event_id');
+    }
+
+    /** Every tie this team appears in, either side, oldest round first. */
+    public function matches()
+    {
+        return EventMatchModel::with(['home', 'away', 'winner', 'category'])
+            ->where('event_id', $this->event_id)
+            ->where('publish', 1)
+            ->where(function ($q) {
+                $q->where('home_team_id', $this->id)->orWhere('away_team_id', $this->id);
+            })
+            ->orderBy('round')->orderBy('order_id')->get();
     }
 
     public function registration()

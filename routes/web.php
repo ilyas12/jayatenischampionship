@@ -161,6 +161,7 @@ $router->group([
     $router->group(['prefix' => 'tennis'], function ($router) {
         Route::get('/', array('as' => 'tennis_home', 'uses' => 'Tennis@home'));
         Route::get('/teams', array('as' => 'tennis_teams', 'uses' => 'Tennis@teams'));
+        Route::get('/teams/{permalink}', array('as' => 'tennis_team', 'uses' => 'Tennis@team'));
         Route::get('/draw', array('as' => 'tennis_bracket', 'uses' => 'Tennis@bracket'));
         Route::get('/registration', array('as' => 'tennis_registration', 'uses' => 'Tennis@registration'));
     });

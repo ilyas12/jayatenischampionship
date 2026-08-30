@@ -63,7 +63,11 @@ class EventMatchModel extends Model
      */
     public function getResultScoreAttribute()
     {
-        $winnerFirst = $this->winner_team_id === $this->home_team_id;
+        // With no winner there is no winner's perspective; read it home-first
+        // rather than falling through to away-first by accident.
+        $winnerFirst = $this->winner_team_id
+            ? $this->winner_team_id === $this->home_team_id
+            : true;
         $win  = preg_split('/\s+/', trim((string) ($winnerFirst ? $this->home_score : $this->away_score)), -1, PREG_SPLIT_NO_EMPTY);
         $lose = preg_split('/\s+/', trim((string) ($winnerFirst ? $this->away_score : $this->home_score)), -1, PREG_SPLIT_NO_EMPTY);
 

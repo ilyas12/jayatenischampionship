@@ -103,6 +103,11 @@ class EventRegistrationModel extends Model
         $team->city       = isset($data['city']) ? $data['city'] : null;
         $team->founded    = isset($data['founded']) && $data['founded'] !== '' ? (int) $data['founded'] : null;
         $team->members    = $this->membersAsLines();
+
+        // The detail page is reached by slug, so a synced team needs one too.
+        if (empty($team->permalink)) {
+            $team->permalink = \Illuminate\Support\Str::slug($team->name) ?: 'team-' . $this->id;
+        }
         $team->publish    = true;
 
         $team->save();

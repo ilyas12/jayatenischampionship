@@ -62,6 +62,17 @@ else
     bad "team count not rendered"
 fi
 
+# Cards link to a detail page keyed on the team's permalink.
+TEAM_URL="$(curl -s --max-time 30 "$BASE/tennis/teams" \
+    | grep -oE 'href="[^"]*/tennis/teams/[a-z0-9-]+"' | head -1 | sed 's/href="//;s/"$//')"
+if [ -n "$TEAM_URL" ]; then
+    case "$TEAM_URL" in http*) ;; *) TEAM_URL="$BASE$TEAM_URL" ;; esac
+    expect "$TEAM_URL" 200 "team detail page"
+else
+    bad "no team detail link on the teams page"
+fi
+expect "$BASE/tennis/teams/no-such-team" 404 "unknown team returns 404"
+
 # Draw and results both read event_matches.
 head_ "Draw and results"
 DRAW_BODY="$(curl -s --max-time 30 "$BASE/tennis/draw")"

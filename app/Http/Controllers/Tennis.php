@@ -71,6 +71,25 @@ class Tennis extends Controller
         ]);
     }
 
+    public function team($permalink)
+    {
+        $event = EventModel::current();
+
+        // Scoped to the event: the same club can appear in more than one
+        // tournament, and permalinks are only unique within one.
+        $team = EventTeamModel::where('event_id', optional($event)->id)
+            ->where('permalink', $permalink)
+            ->where('publish', 1)
+            ->firstOrFail();
+
+        return view('tennis.team', [
+            'tennisActive' => 'teams',
+            'event'        => $event,
+            'team'         => $team,
+            'matches'      => $team->matches(),
+        ]);
+    }
+
     public function bracket()
     {
         $event = EventModel::current();
