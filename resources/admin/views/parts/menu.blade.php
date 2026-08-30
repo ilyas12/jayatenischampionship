@@ -20,6 +20,7 @@
                             <li><a href="{{ URL::route('admin_event_registrations') }}">Registrations</a></li>
                             <li><a href="{{ URL::route('admin_event_teams') }}">Teams</a></li>
                             <li><a href="{{ URL::route('admin_event_schedule') }}">Schedule</a></li>
+                            <li><a href="{{ URL::route('admin_event_matches') }}">Draw</a></li>
                         </ul>
                     </li>
                     <li class="dropdown" {{ $page == "homepage" ? "class='active'" : '' }}>

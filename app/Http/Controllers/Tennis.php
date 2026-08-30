@@ -3,6 +3,7 @@
 namespace terre\Http\Controllers;
 
 use terre\Http\Models\EventModel;
+use terre\Http\Models\EventMatchModel;
 use terre\Http\Models\EventScheduleModel;
 use terre\Http\Models\EventTeamModel;
 
@@ -54,7 +55,33 @@ class Tennis extends Controller
 
     public function bracket()
     {
-        return view('tennis.bracket', ['tennisActive' => 'bracket']);
+        $event = EventModel::current();
+
+        $matches = $event
+            ? EventMatchModel::with(['home', 'away', 'winner'])
+                ->where('event_id', $event->id)->where('publish', 1)
+                ->orderBy('round')->orderBy('order_id')->orderBy('id')->get()
+            : collect();
+
+        // One entry per column, in draw order.
+        $rounds = $matches->groupBy('round')->map(function ($group) {
+            return [
+                'name'    => $group->first()->round_name ?: 'Round ' . $group->first()->round,
+                'matches' => $group->values(),
+            ];
+        })->values();
+
+        // The champion is the last round's winner, not a stored row.
+        $finalMatch = $rounds->count() ? $rounds->last()['matches']->first() : null;
+        $champion   = optional($finalMatch)->winner;
+
+        return view('tennis.bracket', [
+            'tennisActive' => 'bracket',
+            'event'        => $event,
+            'rounds'       => $rounds,
+            'champion'     => $champion,
+            'finalMatch'   => $finalMatch,
+        ]);
     }
 
     public function registration()

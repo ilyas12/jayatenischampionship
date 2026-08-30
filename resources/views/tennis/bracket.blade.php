@@ -47,118 +47,61 @@
       <div class="bracket-scroll">
         <div class="bracket">
 
-          <!-- ---------- Quarter-finals ---------- -->
-          <div class="round">
-            <div class="round__title">Quarter-finals</div>
-            <div class="round__body">
-
-              <div class="pair">
-                <div class="match">
-                  <div class="match__meta"><span>QF 1</span><span>Fri &middot; Centre</span></div>
-                  <div class="slot slot--won">
-                    <span class="slot__seed">1</span><span class="slot__name">Senayan Racquet</span><span class="slot__score">6 6</span>
+          @forelse ($rounds as $round)
+            <div class="round">
+              <div class="round__title">{{ $round['name'] }}</div>
+              <div class="round__body">
+                {{-- The CSS connectors expect two matches per .pair; a round
+                     with a single tie uses .pair--single. --}}
+                @foreach ($round['matches']->chunk(2) as $pair)
+                  <div class="pair{{ $pair->count() === 1 ? ' pair--single' : '' }}">
+                    @foreach ($pair as $match)
+                      <div class="match">
+                        <div class="match__meta">
+                          <span>{{ $match->label }}</span><span>{{ $match->meta }}</span>
+                        </div>
+                        @foreach (['home', 'away'] as $which)
+                          @php($side = $match->side($which))
+                          <div class="slot{{ $side['won'] ? ' slot--won' : '' }}{{ $side['tbd'] ? ' slot--tbd' : '' }}">
+                            <span class="slot__seed">{{ $side['seed'] ?: '—' }}</span>
+                            <span class="slot__name">{{ $side['name'] }}</span>
+                            <span class="slot__score">{{ $side['score'] }}</span>
+                          </div>
+                        @endforeach
+                      </div>
+                    @endforeach
                   </div>
-                  <div class="slot">
-                    <span class="slot__seed">8</span><span class="slot__name">Bandung Baseline</span><span class="slot__score">4 2</span>
-                  </div>
-                </div>
-                <div class="match">
-                  <div class="match__meta"><span>QF 2</span><span>Fri &middot; Court 1</span></div>
-                  <div class="slot slot--won">
-                    <span class="slot__seed">4</span><span class="slot__name">Surabaya Smash</span><span class="slot__score">7 3 6</span>
-                  </div>
-                  <div class="slot">
-                    <span class="slot__seed">5</span><span class="slot__name">Kemang Court</span><span class="slot__score">6 6 4</span>
-                  </div>
-                </div>
+                @endforeach
               </div>
-
-              <div class="pair">
-                <div class="match">
-                  <div class="match__meta"><span>QF 3</span><span>Fri &middot; Court 2</span></div>
-                  <div class="slot slot--won">
-                    <span class="slot__seed">3</span><span class="slot__name">Bali Topspin</span><span class="slot__score">6 6</span>
-                  </div>
-                  <div class="slot">
-                    <span class="slot__seed">6</span><span class="slot__name">Medan Ace</span><span class="slot__score">3 4</span>
-                  </div>
-                </div>
-                <div class="match">
-                  <div class="match__meta"><span>QF 4</span><span>Fri &middot; Centre</span></div>
-                  <div class="slot slot--won">
-                    <span class="slot__seed">2</span><span class="slot__name">Yogyakarta Volley</span><span class="slot__score">6 6 7</span>
-                  </div>
-                  <div class="slot">
-                    <span class="slot__seed">7</span><span class="slot__name">Makassar Netcord</span><span class="slot__score">1 7 5</span>
-                  </div>
-                </div>
-              </div>
-
             </div>
-          </div>
+          @empty
+            <p class="text-soft">The draw has not been published yet.</p>
+          @endforelse
 
-          <!-- ---------- Semi-finals ---------- -->
-          <div class="round">
-            <div class="round__title">Semi-finals</div>
-            <div class="round__body">
-              <div class="pair">
-                <div class="match">
-                  <div class="match__meta"><span>SF 1</span><span>Sat &middot; Centre</span></div>
-                  <div class="slot slot--won">
-                    <span class="slot__seed">1</span><span class="slot__name">Senayan Racquet</span><span class="slot__score">7 6</span>
-                  </div>
-                  <div class="slot">
-                    <span class="slot__seed">4</span><span class="slot__name">Surabaya Smash</span><span class="slot__score">5 4</span>
-                  </div>
-                </div>
-                <div class="match">
-                  <div class="match__meta"><span>SF 2</span><span>Sat &middot; 16:00</span></div>
-                  <div class="slot">
-                    <span class="slot__seed">3</span><span class="slot__name">Bali Topspin</span><span class="slot__score">&ndash;</span>
-                  </div>
-                  <div class="slot">
-                    <span class="slot__seed">2</span><span class="slot__name">Yogyakarta Volley</span><span class="slot__score">&ndash;</span>
+          @if (count($rounds))
+            {{-- Not a stored row: the champion is whoever won the last round. --}}
+            <div class="round">
+              <div class="round__title">Champion</div>
+              <div class="round__body">
+                <div class="pair pair--single">
+                  <div class="match champion p-4">
+                    <svg class="champion__cup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+                      <path d="M7 3h10v5a5 5 0 0 1-10 0V3Z"/>
+                      <path d="M7 5H4v1a4 4 0 0 0 3 3.9M17 5h3v1a4 4 0 0 1-3 3.9"/>
+                      <path d="M12 13v5M8 21h8M10 18h4"/>
+                    </svg>
+                    <div class="champion__name">{{ $champion ? $champion->name : 'To be decided' }}</div>
+                    {{-- The final's own meta, not the event's closes_at: that is
+                         when registration shuts, not when the final is played. --}}
+                    @if ($finalMatch && $finalMatch->meta)
+                      <div class="eyebrow eyebrow--muted mt-2 mb-0">{{ $finalMatch->meta }}</div>
+                    @endif
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          @endif
 
-          <!-- ---------- Final ---------- -->
-          <div class="round">
-            <div class="round__title">Final</div>
-            <div class="round__body">
-              <div class="pair pair--single">
-                <div class="match">
-                  <div class="match__meta"><span>Final</span><span>Sun &middot; 15:00</span></div>
-                  <div class="slot">
-                    <span class="slot__seed">1</span><span class="slot__name">Senayan Racquet</span><span class="slot__score">&ndash;</span>
-                  </div>
-                  <div class="slot slot--tbd">
-                    <span class="slot__seed">&mdash;</span><span class="slot__name">Winner of SF 2</span><span class="slot__score">&ndash;</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ---------- Champion ---------- -->
-          <div class="round">
-            <div class="round__title">Champion</div>
-            <div class="round__body">
-              <div class="pair pair--single">
-                <div class="match champion p-4">
-                  <svg class="champion__cup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
-                    <path d="M7 3h10v5a5 5 0 0 1-10 0V3Z"/>
-                    <path d="M7 5H4v1a4 4 0 0 0 3 3.9M17 5h3v1a4 4 0 0 1-3 3.9"/>
-                    <path d="M12 13v5M8 21h8M10 18h4"/>
-                  </svg>
-                  <div class="champion__name">To be decided</div>
-                  <div class="eyebrow eyebrow--muted mt-2 mb-0">Sunday 19 October</div>
-                </div>
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>
