@@ -4,7 +4,7 @@
 	</div>
 	<div class="col-xs-{!! $input_width !!}">
 		@foreach($option as $val => $text)
-			@php $checked = in_array($val, (array)$value)
+			@php($checked = in_array($val, (array) $value))
 			@if($inline)
 				<label class="checkbox-inline">
 			@else

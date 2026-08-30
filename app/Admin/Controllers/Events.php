@@ -122,8 +122,8 @@ class Events extends ScaffoldController
             [
                 'name'  => 'publish',
                 'label' => 'Published',
-                'type'  => 'checkbox',
-                'option' => [1 => 'Yes'],
+                'type'   => 'select',
+                'option' => [1 => 'Yes', 0 => 'No'],
             ],
         ];
     }

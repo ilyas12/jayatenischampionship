@@ -3,6 +3,7 @@
 namespace terre\Http\Controllers;
 
 use terre\Http\Models\EventModel;
+use terre\Http\Models\EventTeamModel;
 
 /**
  * Grandstand Open — the static slice of the tennis mockup.
@@ -23,7 +24,22 @@ class Tennis extends Controller
 
     public function teams()
     {
-        return view('tennis.teams', ['tennisActive' => 'teams']);
+        // Teams belong to an event, so an empty/closed calendar shows an empty
+        // grid rather than another event's entries.
+        $event = EventModel::current();
+
+        $teams = $event
+            ? EventTeamModel::where('event_id', $event->id)->where('publish', 1)
+                ->orderBy('order_id')->orderBy('name')->get()
+            : collect();
+
+        return view('tennis.teams', [
+            'tennisActive' => 'teams',
+            'event'        => $event,
+            'teams'        => $teams,
+            'groups'       => $teams->pluck('team_group')->filter()->unique()->sort()->values(),
+            'playerCount'  => $teams->sum(function ($team) { return count($team->member_list); }),
+        ]);
     }
 
     public function bracket()

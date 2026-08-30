@@ -1,0 +1,79 @@
+<?php
+
+namespace terre\Http\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class EventTeamModel extends Model
+{
+    protected $table = 'event_teams';
+
+    protected $fillable = [
+        'event_id', 'name', 'short_code', 'city', 'founded', 'photo',
+        'description', 'seed', 'team_group', 'qualified', 'members',
+        'order_id', 'publish',
+    ];
+
+    protected $casts = [
+        'qualified' => 'boolean',
+        'publish'   => 'boolean',
+    ];
+
+    public function event()
+    {
+        return $this->belongsTo(EventModel::class, 'event_id');
+    }
+
+    /**
+     * The `members` textarea parsed into rows.
+     *
+     * One player per line, "Name | Role | Rank"; role and rank optional. Blank
+     * lines are skipped so trailing newlines do not become empty players.
+     *
+     * @return array<int, array{name:string, role:string, rank:string}>
+     */
+    public function getMemberListAttribute()
+    {
+        $rows = [];
+
+        foreach (preg_split('/\R/', (string) $this->members) as $line) {
+            if (trim($line) === '') {
+                continue;
+            }
+
+            $parts = array_map('trim', explode('|', $line));
+
+            $rows[] = [
+                'name' => $parts[0],
+                'role' => isset($parts[1]) ? $parts[1] : '',
+                'rank' => isset($parts[2]) ? $parts[2] : '',
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Card image: the uploaded photo, else the placeholder crest for the team's
+     * short code, else the generic one.
+     */
+    public function getPhotoUrlAttribute()
+    {
+        if ($this->photo) {
+            return url('resources/assets/uploads/event_teams/' . $this->photo);
+        }
+
+        $code = strtolower((string) $this->short_code);
+        $svg  = base_path('resources/assets/tennis/img/teams/' . $code . '.svg');
+
+        return file_exists($svg) && $code !== ''
+            ? url('resources/assets/tennis/img/teams/' . $code . '.svg')
+            : url('resources/assets/images/none.png');
+    }
+
+    /** The value the front-end filter buttons match on. */
+    public function getFilterKeyAttribute()
+    {
+        return trim(strtolower((string) $this->team_group) . ($this->qualified ? ' qualified' : ''));
+    }
+}

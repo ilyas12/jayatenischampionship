@@ -49,6 +49,19 @@ for path in "" rates branches news-and-events underlying contact; do
     expect "$BASE/$path" 200 "GET /$path"
 done
 
+# Teams page reads event_teams, so a published team must show up on it.
+head_ "Teams from the CMS"
+if curl -s --max-time 30 "$BASE/tennis/teams" | grep -q 'id="teamGrid"'; then
+    ok "teams grid renders"
+else
+    bad "teams grid missing"
+fi
+if curl -s --max-time 30 "$BASE/tennis/teams" | grep -qE 'teamCount">[0-9]+'; then
+    ok "team count is rendered from the data"
+else
+    bad "team count not rendered"
+fi
+
 # Event registration flow, end to end: submit -> payment page -> proof upload.
 # Needs the grandstand-open-2026 event seeded; skips cleanly if it is not.
 head_ "Event registration flow"

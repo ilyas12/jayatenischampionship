@@ -110,6 +110,7 @@ $router->group([
         Route::any('/instagram_feed', array('as' => 'admin_instagram_feed', 'uses' => 'Setting@instagramfeed'));
         // EVENT REGISTRATION
         Route::any('/events', array('as' => 'admin_events', 'uses' => 'Events@index'));
+        Route::any('/event_teams', array('as' => 'admin_event_teams', 'uses' => 'EventTeams@index'));
         Route::any('/event_registrations', array('as' => 'admin_event_registrations', 'uses' => 'EventRegistrations@index'));
 
         Route::any('/newsletter', array('as' => 'admin_newsletter', 'uses' => 'Newsletter@index'));
