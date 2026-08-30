@@ -105,7 +105,7 @@ class EventTeams extends ScaffoldController
             [
                 'name'   => 'short_code',
                 'label'  => 'Short Code',
-                'suffix' => 'Up to 4 letters. Shown on the crest, and picks the placeholder image (SRC uses src.svg).',
+                'suffix' => 'Up to 4 letters, unique within the event. Shown on the crest, and picks the placeholder image (SRC uses src.svg). A code another club already holds is given a numeric suffix.',
             ],
             ['name' => 'city', 'label' => 'City'],
             ['name' => 'founded', 'label' => 'Founded', 'validation' => 'nullable|integer'],

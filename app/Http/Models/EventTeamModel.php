@@ -18,6 +18,55 @@ class EventTeamModel extends Model
         'publish'   => 'boolean',
     ];
 
+    /**
+     * Keep short codes unique within an event, whichever way a team arrives.
+     *
+     * The database enforces it, so without this an admin typing a code another
+     * club already holds — or an entry form posting one — would surface a raw
+     * integrity error. Suffixing is quiet and recoverable; the admin sees the
+     * adjusted code on the row and can pick a better one.
+     */
+    protected static function booted()
+    {
+        static::saving(function ($team) {
+            if ($team->short_code === null || $team->short_code === '') {
+                return;
+            }
+
+            if (! $team->isDirty('short_code') && ! $team->isDirty('event_id') && $team->exists) {
+                return;
+            }
+
+            $team->short_code = static::freeShortCode($team->event_id, $team->short_code, $team->id);
+        });
+    }
+
+    /** The given code, or the nearest suffixed variant nobody is using. */
+    public static function freeShortCode($eventId, $code, $ignoreId = null)
+    {
+        $taken = function ($candidate) use ($eventId, $ignoreId) {
+            return static::where('event_id', $eventId)
+                ->where('short_code', $candidate)
+                ->when($ignoreId, function ($q) use ($ignoreId) { return $q->where('id', '!=', $ignoreId); })
+                ->exists();
+        };
+
+        if (! $taken($code)) {
+            return $code;
+        }
+
+        // Column is 4 characters, so the suffix eats into the code.
+        for ($n = 2; $n < 100; $n++) {
+            $candidate = substr($code, 0, 4 - strlen((string) $n)) . $n;
+
+            if (! $taken($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return $code;
+    }
+
     public function event()
     {
         return $this->belongsTo(EventModel::class, 'event_id');
