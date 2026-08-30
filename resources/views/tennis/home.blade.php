@@ -87,7 +87,7 @@
       <div class="row g-5">
         <div class="col-lg-4">
           <span class="eyebrow">Order of play</span>
-          <h2>Eight days.</h2>
+          <h2>{{ $dayCount }} {{ \Illuminate\Support\Str::plural('day', $dayCount) }}.</h2>
           <p class="lede mt-3">Gates open one hour before the first match. Order of play is confirmed at 18:00 the evening prior.</p>
         </div>
         <div class="col-lg-8">

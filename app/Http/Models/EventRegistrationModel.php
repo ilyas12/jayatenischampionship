@@ -58,6 +58,81 @@ class EventRegistrationModel extends Model
                 $registration->verified_by = optional(auth()->user())->email ?: $registration->verified_by;
             }
         });
+
+        // After the write, because a brand new registration has no id until then.
+        static::saved(function ($registration) {
+            if ($registration->wasChanged('status')) {
+                $registration->syncTeam();
+            }
+        });
+    }
+
+    /**
+     * Mirror a paid entry onto the public teams page.
+     *
+     * The registration is the source of truth for who is competing, so the
+     * fields it collects are written every time. Seed, group, photo and the
+     * blurb are editorial — assigned after entries close — so they are left
+     * alone and an admin's work is never overwritten by a later status change.
+     *
+     * Losing paid status unpublishes the team rather than deleting it, for the
+     * same reason.
+     */
+    public function syncTeam()
+    {
+        $team = EventTeamModel::where('registration_id', $this->id)->first();
+
+        if ($this->status !== self::PAID) {
+            if ($team) {
+                $team->publish = false;
+                $team->save();
+            }
+
+            return $team;
+        }
+
+        $data = (array) $this->data;
+
+        $team = $team ?: new EventTeamModel(['registration_id' => $this->id]);
+
+        $team->event_id   = $this->event_id;
+        $team->name       = isset($data['team_name']) && $data['team_name'] !== ''
+            ? $data['team_name']
+            : $this->name;
+        $team->short_code = isset($data['team_short']) ? $data['team_short'] : null;
+        $team->city       = isset($data['city']) ? $data['city'] : null;
+        $team->founded    = isset($data['founded']) && $data['founded'] !== '' ? (int) $data['founded'] : null;
+        $team->members    = $this->membersAsLines();
+        $team->publish    = true;
+
+        $team->save();
+
+        return $team;
+    }
+
+    /**
+     * The members repeater as the "Name | Role | Rank" lines event_teams stores,
+     * so the same squad reads identically however it was entered.
+     */
+    protected function membersAsLines()
+    {
+        $lines = [];
+
+        foreach ((array) data_get($this->data, 'members', []) as $member) {
+            $name = trim((string) data_get($member, 'name'));
+
+            if ($name === '') {
+                continue;
+            }
+
+            $lines[] = trim(implode(' | ', array_filter([
+                $name,
+                trim((string) data_get($member, 'role')),
+                trim((string) data_get($member, 'rank')),
+            ], function ($part) { return $part !== ''; })));
+        }
+
+        return $lines ? implode("\n", $lines) : null;
     }
 
     public function event()

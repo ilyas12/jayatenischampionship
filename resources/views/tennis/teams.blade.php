@@ -17,8 +17,11 @@
         </div>
         <div class="col-lg-5">
           <p class="lede mb-0">
-            Eight clubs confirmed for the team championship, with every registered player
-            and their national ranking. Lists lock on 5 October.
+            {{ $teams->count() }} {{ \Illuminate\Support\Str::plural('club', $teams->count()) }} confirmed for the team
+            championship, with every registered player and their national ranking.
+            @if ($event && $event->closes_at)
+              Lists lock on {{ $event->closes_at->format('j F') }}.
+            @endif
           </p>
         </div>
       </div>
