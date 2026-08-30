@@ -144,10 +144,10 @@ fi
 
 # Grandstand Open — static slice of the tennis mockup.
 head_ "Tennis theme (/tennis)"
-for path in tennis tennis/teams tennis/draw tennis/registration; do
+for path in tennis tennis/teams tennis/draw tennis/schedule tennis/registration; do
     expect "$BASE/$path" 200 "GET /$path"
 done
-for asset in css/style.css js/main.js img/teams/src.svg; do
+for asset in css/style.css js/main.js img/teams/src.svg img/players/player-serve.jpg img/players/player-forehand.jpg; do
     expect "$BASE/resources/assets/tennis/$asset" 200 "GET tennis asset $asset"
 done
 # The rules modal lives after </main> in the source and was missed by the first

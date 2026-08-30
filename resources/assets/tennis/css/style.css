@@ -587,7 +587,9 @@ a:hover{ color:var(--purple); }
 }
 
 .squad-card__photo img { width: 100%; height: 100%; object-fit: cover; }
-.squad-card__photo .tennis-silhouette { width: 62%; height: 62%; color: #0A4A2A; opacity: .26; }
+/* The illustrated stand-in already carries its own cream ground, so it fills
+   the frame like a real portrait rather than floating on the card colour. */
+.squad-card__illustration { width: 100%; height: 100%; object-fit: cover; }
 
 .squad-card__body { padding: .85rem .95rem 1rem; }
 .squad-card__name { margin: 0; font-size: 1rem; line-height: 1.25; }

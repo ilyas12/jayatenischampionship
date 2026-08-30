@@ -17,7 +17,23 @@ class EventTeamMemberModel extends Model
         return $this->belongsTo(EventTeamModel::class, 'team_id');
     }
 
-    /** Uploaded portrait, or a generated initials avatar so rows never look broken. */
+    /**
+     * The two illustrated stand-ins, used when a player has no portrait.
+     *
+     * Which one a player gets is keyed on their id, so it is stable between
+     * renders — a squad does not reshuffle its placeholders on reload — while
+     * still varying down the grid.
+     */
+    const PLACEHOLDERS = ['player-serve.jpg', 'player-forehand.jpg'];
+
+    public function getPlaceholderPhotoUrlAttribute()
+    {
+        $file = self::PLACEHOLDERS[$this->id % count(self::PLACEHOLDERS)];
+
+        return url('resources/assets/tennis/img/players/' . $file);
+    }
+
+    /** Uploaded portrait only; callers fall back to the placeholder above. */
     public function getPhotoUrlAttribute()
     {
         return $this->photo

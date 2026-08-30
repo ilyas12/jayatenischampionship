@@ -108,11 +108,13 @@
             @php $person = $member['member']; @endphp
             <article class="squad-card">
               <div class="squad-card__photo">
-                @if ($person->photo_url)
-                  <img src="{{ $person->photo_url }}" alt="{{ $person->name }}" loading="lazy">
-                @else
-                  @include('tennis.partials.silhouette')
-                @endif
+                {{-- No portrait: an illustrated player rather than an empty
+                     frame. Same 3:4 crop either way, so the grid keeps its
+                     rhythm whether a squad is photographed or not. --}}
+                <img src="{{ $person->photo_url ?: $person->placeholder_photo_url }}"
+                     alt="{{ $person->photo_url ? $person->name : '' }}"
+                     class="{{ $person->photo_url ? '' : 'squad-card__illustration' }}"
+                     loading="lazy">
               </div>
               <div class="squad-card__body">
                 <h3 class="squad-card__name">{{ $person->name }}</h3>

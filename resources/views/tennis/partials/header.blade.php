@@ -24,7 +24,7 @@
           <li class="nav-item"><a class="nav-link {{ ($tennisActive ?? '') === 'home' ? 'active' : '' }}" href="{{ route('tennis_home') }}">Overview</a></li>
           <li class="nav-item"><a class="nav-link {{ ($tennisActive ?? '') === 'teams' ? 'active' : '' }}" href="{{ route('tennis_teams') }}">Teams</a></li>
           <li class="nav-item"><a class="nav-link {{ ($tennisActive ?? '') === 'bracket' ? 'active' : '' }}" href="{{ route('tennis_bracket') }}">Draw</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ route('tennis_home') }}#schedule">Schedule</a></li>
+          <li class="nav-item"><a class="nav-link {{ ($tennisActive ?? '') === 'schedule' ? 'active' : '' }}" href="{{ route('tennis_schedule') }}">Schedule</a></li>
         </ul>
         <a href="{{ route('tennis_registration') }}" class="btn btn-purple ms-lg-4 mb-3 mb-lg-0">Register</a>
       </div>

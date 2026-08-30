@@ -20,6 +20,15 @@ use terre\Http\Models\EventTeamModel;
  */
 class Tennis extends Controller
 {
+    /** Published order of play for an event, in date order. */
+    protected function scheduleFor($event)
+    {
+        return $event
+            ? EventScheduleModel::where('event_id', $event->id)->where('publish', 1)
+                ->orderBy('starts_on')->orderBy('order_id')->get()
+            : collect();
+    }
+
     /** Published teams for an event, in display order. */
     protected function teamsFor($event)
     {
@@ -37,10 +46,7 @@ class Tennis extends Controller
 
         $categories = EventCategoryModel::forEvent($event);
 
-        $schedule = $event
-            ? EventScheduleModel::where('event_id', $event->id)->where('publish', 1)
-                ->orderBy('starts_on')->orderBy('order_id')->get()
-            : collect();
+        $schedule = $this->scheduleFor($event);
 
         return view('tennis.home', [
             'tennisActive' => 'home',
@@ -50,6 +56,19 @@ class Tennis extends Controller
             // Hero counters, all from the event's own data.
             'clubCount'    => $teams->count(),
             'playerCount'  => $teams->sum(function ($team) { return count($team->member_list); }),
+            'dayCount'     => $schedule->pluck('starts_on')->filter()->unique()->count(),
+        ]);
+    }
+
+    public function schedule()
+    {
+        $event    = EventModel::current();
+        $schedule = $this->scheduleFor($event);
+
+        return view('tennis.schedule', [
+            'tennisActive' => 'schedule',
+            'event'        => $event,
+            'schedule'     => $schedule,
             'dayCount'     => $schedule->pluck('starts_on')->filter()->unique()->count(),
         ]);
     }
