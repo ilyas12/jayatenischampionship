@@ -28,19 +28,9 @@
     <title>@yield('title') | Yayasan Swarnadwipa Peduli Bangsa</title>
     <meta name="description" content="@yield('meta_description', 'Yayasan Swarnadwipa Peduli Bangsa — lembaga sosial yang berdedikasi meningkatkan kualitas hidup masyarakat melalui program pendidikan, sosial, kemanusiaan, pemberdayaan ekonomi, kesehatan, dan pelestarian lingkungan.')">
 
-    @php
-        // Cache-bust on file mtime. Without it the browser holds on to a stale
-        // spd.css after every edit, which reads as "the CSS change did nothing".
-        $spdAsset = function ($path) {
-            $full = base_path($path);
-            $v = file_exists($full) ? filemtime($full) : null;
-            return asset($path) . ($v ? '?v=' . $v : '');
-        };
-    @endphp
-
     <link rel="shortcut icon" href="{{ asset('resources/assets/spd/images/logo.png') }}">
-    <link rel="stylesheet" href="{{ $spdAsset('resources/assets/vendor/bootstrap/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ $spdAsset('resources/assets/spd/css/spd.css') }}">
+    <link rel="stylesheet" href="{{ \terre\Libraries\Asset::v('resources/assets/vendor/bootstrap/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ \terre\Libraries\Asset::v('resources/assets/spd/css/spd.css') }}">
 </head>
 <body class="spd">
 
@@ -153,6 +143,6 @@
         </div>
     </footer>
 
-    <script src="{{ $spdAsset('resources/assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ \terre\Libraries\Asset::v('resources/assets/vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
 </body>
 </html>

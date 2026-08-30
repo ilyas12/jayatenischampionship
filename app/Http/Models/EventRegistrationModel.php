@@ -65,49 +65,13 @@ class EventRegistrationModel extends Model
         return $this->belongsTo(EventModel::class, 'event_id');
     }
 
-    /**
-     * The whole entry as a read-only block for the admin edit screen — the
-     * generic columns plus whatever event-specific fields landed in `data`.
-     */
+    /** The whole entry as a read-only block for the admin edit screen. */
     public function getSummaryHtmlAttribute()
     {
-        $rows = [
-            'Code'   => $this->code,
-            'Name'   => $this->name,
-            'Email'  => $this->email,
-            'Phone'  => $this->phone,
-            'Amount' => $this->amount,
-        ];
-
-        foreach ((array) $this->data as $key => $value) {
-            $label = ucwords(str_replace('_', ' ', $key));
-            $rows[$label] = is_array($value) ? $this->renderNested($value) : $value;
-        }
-
-        $html = '<table class="table table-condensed">';
-        foreach ($rows as $label => $value) {
-            $html .= '<tr><th style="width:200px">' . e($label) . '</th><td>'
-                . (strpos((string) $value, '<') === 0 ? $value : nl2br(e((string) $value)))
-                . '</td></tr>';
-        }
-
-        return $html . '</table>';
-    }
-
-    /** Nested `data` entries — the members repeater, mainly. */
-    protected function renderNested(array $value)
-    {
-        $html = '<ul style="margin:0;padding-left:18px">';
-        foreach ($value as $row) {
-            $parts = is_array($row)
-                ? array_filter(array_map(function ($k, $v) {
-                    return $v === null || $v === '' ? null : $k . ': ' . $v;
-                }, array_keys($row), $row))
-                : [$row];
-            $html .= '<li>' . e(implode(' — ', $parts)) . '</li>';
-        }
-
-        return $html . '</ul>';
+        return '<pre style="white-space:pre-wrap">'
+            . e(json_encode($this->only(['code', 'name', 'email', 'phone', 'amount']) + (array) $this->data,
+                            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+            . '</pre>';
     }
 
     /** The uploaded proof, as a link, for the admin edit screen. */
