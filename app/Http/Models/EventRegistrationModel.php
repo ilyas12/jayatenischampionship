@@ -102,8 +102,6 @@ class EventRegistrationModel extends Model
         $team->short_code = isset($data['team_short']) ? $data['team_short'] : null;
         $team->city       = isset($data['city']) ? $data['city'] : null;
         $team->founded    = isset($data['founded']) && $data['founded'] !== '' ? (int) $data['founded'] : null;
-        $team->members    = $this->membersAsLines();
-
         // The detail page is reached by slug, so a synced team needs one too.
         if (empty($team->permalink)) {
             $team->permalink = \Illuminate\Support\Str::slug($team->name) ?: 'team-' . $this->id;
@@ -112,32 +110,44 @@ class EventRegistrationModel extends Model
 
         $team->save();
 
+        $this->syncTeamMembers($team);
+
         return $team;
     }
 
     /**
-     * The members repeater as the "Name | Role | Rank" lines event_teams stores,
-     * so the same squad reads identically however it was entered.
+     * Mirror the members repeater onto the team's squad.
+     *
+     * Matched on name so an admin's uploaded portrait survives a re-sync: the
+     * entry form has no photo field, so rebuilding the rows wholesale would
+     * delete work the registration cannot replace.
      */
-    protected function membersAsLines()
+    protected function syncTeamMembers(EventTeamModel $team)
     {
-        $lines = [];
+        $order = 0;
+        $kept  = [];
 
-        foreach ((array) data_get($this->data, 'members', []) as $member) {
-            $name = trim((string) data_get($member, 'name'));
+        foreach ((array) data_get($this->data, 'members', []) as $entry) {
+            $name = trim((string) data_get($entry, 'name'));
 
             if ($name === '') {
                 continue;
             }
 
-            $lines[] = trim(implode(' | ', array_filter([
-                $name,
-                trim((string) data_get($member, 'role')),
-                trim((string) data_get($member, 'rank')),
-            ], function ($part) { return $part !== ''; })));
+            $member = EventTeamMemberModel::firstOrNew(['team_id' => $team->id, 'name' => $name]);
+            $member->role     = trim((string) data_get($entry, 'role')) ?: null;
+            $member->rank     = trim((string) data_get($entry, 'rank')) ?: null;
+            $member->order_id = $order++;
+            $member->publish  = true;
+            $member->save();
+
+            $kept[] = $member->id;
         }
 
-        return $lines ? implode("\n", $lines) : null;
+        // Someone removed from the entry should leave the squad.
+        if ($kept) {
+            EventTeamMemberModel::where('team_id', $team->id)->whereNotIn('id', $kept)->delete();
+        }
     }
 
     public function event()

@@ -129,12 +129,6 @@ class EventTeams extends ScaffoldController
                 'type'   => 'select',
                 'option' => [1 => 'Yes', 0 => 'No'],
             ],
-            [
-                'name'   => 'members',
-                'label'  => 'Players',
-                'type'   => 'textarea',
-                'suffix' => 'One per line: <code>Name | Role | Rank</code> — for example <code>Arya Wijaya | Captain | 4</code>. Role and rank are optional.',
-            ],
             ['name' => 'order_id', 'label' => 'Order', 'validation' => 'nullable|integer'],
             [
                 'name'   => 'publish',

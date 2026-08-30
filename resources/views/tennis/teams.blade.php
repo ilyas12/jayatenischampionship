@@ -88,7 +88,10 @@
                     <ul class="member-list">
                       @foreach ($team->member_list as $member)
                         <li>
-                          <span>{{ $member['name'] }}</span>
+                          <span class="member-list__who">
+                            @include('tennis.partials.avatar', ['member' => $member['member']])
+                            <span class="member-list__name">{{ $member['name'] }}</span>
+                          </span>
                           <span>
                             {{ $member['role'] }}@if ($member['role'] && $member['rank']) &middot; @endif
                             @if ($member['rank'])#{{ $member['rank'] }}@endif

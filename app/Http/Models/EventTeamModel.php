@@ -10,7 +10,7 @@ class EventTeamModel extends Model
 
     protected $fillable = [
         'event_id', 'registration_id', 'name', 'permalink', 'short_code', 'city', 'founded', 'photo',
-        'description', 'seed', 'team_group', 'qualified', 'members',
+        'description', 'seed', 'team_group', 'qualified',
         'order_id', 'publish',
     ];
 
@@ -41,33 +41,29 @@ class EventTeamModel extends Model
         return $this->belongsTo(EventRegistrationModel::class, 'registration_id');
     }
 
+    public function members()
+    {
+        return $this->hasMany(EventTeamMemberModel::class, 'team_id')
+            ->where('publish', 1)
+            ->orderBy('order_id')->orderBy('id');
+    }
+
     /**
-     * The `members` textarea parsed into rows.
+     * The squad. Kept as a plain array with the same keys the textarea version
+     * produced, plus the member itself so templates can reach its photo.
      *
-     * One player per line, "Name | Role | Rank"; role and rank optional. Blank
-     * lines are skipped so trailing newlines do not become empty players.
-     *
-     * @return array<int, array{name:string, role:string, rank:string}>
+     * @return array<int, array{name:string, role:string, rank:string, member:EventTeamMemberModel}>
      */
     public function getMemberListAttribute()
     {
-        $rows = [];
-
-        foreach (preg_split('/\R/', (string) $this->members) as $line) {
-            if (trim($line) === '') {
-                continue;
-            }
-
-            $parts = array_map('trim', explode('|', $line));
-
-            $rows[] = [
-                'name' => $parts[0],
-                'role' => isset($parts[1]) ? $parts[1] : '',
-                'rank' => isset($parts[2]) ? $parts[2] : '',
+        return $this->members->map(function ($member) {
+            return [
+                'name'   => $member->name,
+                'role'   => (string) $member->role,
+                'rank'   => (string) $member->rank,
+                'member' => $member,
             ];
-        }
-
-        return $rows;
+        })->all();
     }
 
     /**

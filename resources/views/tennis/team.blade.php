@@ -54,17 +54,20 @@
 
           @if (count($team->member_list))
             <h2 class="h5 mt-5 mb-3">Squad ({{ count($team->member_list) }})</h2>
-            <ul class="member-list">
+            <div class="squad-grid">
               @foreach ($team->member_list as $member)
-                <li>
-                  <span>{{ $member['name'] }}</span>
+                <div class="squad-card">
+                  @include('tennis.partials.avatar', ['member' => $member['member']])
                   <span>
-                    {{ $member['role'] }}@if ($member['role'] && $member['rank']) &middot; @endif
-                    @if ($member['rank'])#{{ $member['rank'] }}@endif
+                    <span class="squad-card__name">{{ $member['name'] }}</span>
+                    <span class="squad-card__meta d-block">
+                      {{ $member['role'] }}@if ($member['role'] && $member['rank']) &middot; @endif
+                      @if ($member['rank'])#{{ $member['rank'] }}@endif
+                    </span>
                   </span>
-                </li>
+                </div>
               @endforeach
-            </ul>
+            </div>
           @endif
         </div>
 

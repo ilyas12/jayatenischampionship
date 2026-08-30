@@ -113,6 +113,7 @@ $router->group([
         Route::any('/event_categories', array('as' => 'admin_event_categories', 'uses' => 'EventCategories@index'));
         Route::any('/event_matches', array('as' => 'admin_event_matches', 'uses' => 'EventMatches@index'));
         Route::any('/event_schedule', array('as' => 'admin_event_schedule', 'uses' => 'EventSchedule@index'));
+        Route::any('/event_team_members', array('as' => 'admin_event_team_members', 'uses' => 'EventTeamMembers@index'));
         Route::any('/event_teams', array('as' => 'admin_event_teams', 'uses' => 'EventTeams@index'));
         Route::any('/event_registrations', array('as' => 'admin_event_registrations', 'uses' => 'EventRegistrations@index'));
 
