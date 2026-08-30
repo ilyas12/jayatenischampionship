@@ -106,10 +106,6 @@ class Tennis extends Controller
             'tennisActive' => 'bracket',
             'event'        => $event,
             'draws'        => $draws,
-            // The board lists every played tie regardless of draw; the tabs
-            // choose a bracket, not a results filter.
-            'results'      => $matches->filter(function ($m) { return $m->winner_team_id; })
-                                      ->sortByDesc('round')->values(),
         ]);
     }
 
@@ -129,6 +125,9 @@ class Tennis extends Controller
             'key'        => $key,
             'name'       => $name,
             'rounds'     => $rounds,
+            // This draw's played ties, latest round first.
+            'results'    => $matches->filter(function ($m) { return $m->winner_team_id; })
+                                    ->sortByDesc('round')->values(),
             'finalMatch' => $finalMatch,
             'champion'   => optional($finalMatch)->winner,
         ];

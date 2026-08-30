@@ -123,7 +123,8 @@
           <p class="lede">Every tie is two singles rubbers and one doubles. Set scores as signed off by the referee.</p>
         </div>
         <div class="col-lg-8">
-          <div class="board">
+          @forelse ($draws as $i => $draw)
+          <div class="board" data-draw-panel="{{ $draw['key'] }}" @if ($i > 0) hidden @endif>
             <div class="board__inner">
               <div class="table-responsive">
                 <table>
@@ -136,7 +137,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @forelse ($results as $result)
+                    @forelse ($draw['results'] as $result)
                       <tr>
                         <td class="board__round">{{ $result->label }}</td>
                         <td>
@@ -155,6 +156,9 @@
               </div>
             </div>
           </div>
+          @empty
+            <p class="text-soft">No results yet.</p>
+          @endforelse
         </div>
       </div>
     </div>
