@@ -32,8 +32,13 @@
 
         <div class="col-lg-8">
           <!-- Blade: <form method="POST" action=" route('registration.store') " ...> csrf -->
+          @if (! $event)
+            <div class="alert alert-warning">
+              Registration is not open at the moment. Please check back.
+            </div>
+          @else
           <form id="registrationForm" class="needs-validation" method="post"
-                action="{{ route('event_register', 'grandstand-open-2026') }}" novalidate>
+                action="{{ route('event_register', $event->slug) }}" novalidate>
             @csrf
             @if ($errors->any())
               <div class="alert alert-danger">
@@ -212,6 +217,7 @@
             </div>
 
           </form>
+          @endif
         </div>
 
         <!-- ---------- summary ---------- -->

@@ -2,6 +2,8 @@
 
 namespace terre\Http\Controllers;
 
+use terre\Http\Models\EventModel;
+
 /**
  * Grandstand Open — the static slice of the tennis mockup.
  *
@@ -31,6 +33,11 @@ class Tennis extends Controller
 
     public function registration()
     {
-        return view('tennis.registration', ['tennisActive' => 'registration']);
+        // Whichever event is open, rather than a slug baked into the form.
+        // Null renders the closed state instead of a form posting to a 404.
+        return view('tennis.registration', [
+            'tennisActive' => 'registration',
+            'event'        => EventModel::current(),
+        ]);
     }
 }
