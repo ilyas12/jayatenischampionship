@@ -9,7 +9,7 @@ use terre\Http\Models\EventScheduleModel;
 use terre\Http\Models\EventTeamModel;
 
 /**
- * Grandstand Open — the static slice of the tennis mockup.
+ * Jaya Tennis Championship — the static slice of the tennis mockup.
  *
  * Content is still the mockup's markup: no data is read from the CMS yet. The
  * <!-- @foreach --> markers left in the views mark every place a query belongs

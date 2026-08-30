@@ -4,13 +4,11 @@
     <nav class="navbar navbar-expand-lg p-0" aria-label="Main navigation">
 
       <a class="brand" href="{{ route('tennis_home') }}">
-        <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
-          <circle cx="20" cy="20" r="18" fill="#0A4A2A"/>
-          <path d="M6 8c8 6 8 18 0 24M34 8c-8 6-8 18 0 24" fill="none" stroke="#D8E64A" stroke-width="2"/>
-        </svg>
+        <img class="brand__mark" src="{{ \terre\Libraries\Asset::v('resources/assets/tennis/img/brand/jc-mark.png') }}"
+             alt="" width="320" height="320">
         <span>
-          <span class="brand__word">Grandstand Open</span>
-          <span class="brand__sub">Est. 1974 &middot; Jakarta</span>
+          <span class="brand__word">Jaya Tennis Championship</span>
+          <span class="brand__sub">HIPMI Jaya Tennis Club &middot; Jakarta</span>
         </span>
       </a>
 

@@ -8,7 +8,7 @@
     <div class="modal-content rules">
       <div class="modal-header rules__head">
         <div>
-          <span class="eyebrow mb-1">Grandstand Open 2026</span>
+          <span class="eyebrow mb-1">Jaya Tennis Championship 2026</span>
           <h2 class="modal-title h4 mb-0" id="rulesModalLabel">Rules &amp; code of conduct</h2>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

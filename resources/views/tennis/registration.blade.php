@@ -1,7 +1,7 @@
 @extends('tennis.layout')
 
-@section('title', 'Register — Grandstand Open 2026')
-@section('description', 'Enter the Grandstand Open 2026. Register your team, add your players and confirm your place in the draw.')
+@section('title', 'Register')
+@section('description', 'Enter the Jaya Tennis Championship 2026. Register your team, add your players and confirm your place in the draw.')
 
 @section('content')
 
@@ -233,7 +233,7 @@
               <dd>Full refund until 1 October, none after.</dd>
             </dl>
             <hr class="rule my-4" style="opacity:.25">
-            <p class="mb-0 small">Questions? <a href="mailto:entries@grandstandopen.id" class="text-decoration-underline" style="color:#fff">entries@grandstandopen.id</a></p>
+            <p class="mb-0 small">Questions? <a href="mailto:entries@jayatennis.id" class="text-decoration-underline" style="color:#fff">entries@jayatennis.id</a></p>
           </aside>
         </div>
 

@@ -1,7 +1,7 @@
 @extends('tennis.layout')
 
-@section('title', 'The Draw — Grandstand Open 2026')
-@section('description', 'Live competition bracket for the Grandstand Open 2026 club team championship — quarter-finals through to the final.')
+@section('title', 'The draw')
+@section('description', 'Live competition bracket for the Jaya Tennis Championship 2026 club team championship — quarter-finals through to the final.')
 
 @section('content')
 

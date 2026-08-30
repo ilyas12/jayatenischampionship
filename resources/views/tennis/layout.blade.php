@@ -1,11 +1,11 @@
-<!-- Grandstand Open — sliced from the static tennis/ mockup. Everything outside <main> lives here; each page is extends + section. Bootstrap 5.3.3 is served from resources/assets/vendor/bootstrap (shared with the SPD theme) rather than the mockup's CDN link, so the site has no third-party runtime dependency. Google Fonts is still remote — Cormorant Garamond and Inter carry the whole look and self-hosting them is a separate job. ponytail: swap for local woff2 if the site must work offline or without third-party requests. -->
+<!-- Jaya Tennis Championship — sliced from the static tennis/ mockup. Everything outside <main> lives here; each page is extends + section. Bootstrap 5.3.3 is served from resources/assets/vendor/bootstrap (shared with the SPD theme) rather than the mockup's CDN link, so the site has no third-party runtime dependency. Google Fonts is still remote — Cormorant Garamond and Inter carry the whole look and self-hosting them is a separate job. ponytail: swap for local woff2 if the site must work offline or without third-party requests. -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>@yield('title', 'Grandstand Open 2026') — Grandstand Open</title>
-  <meta name="description" content="@yield('description', 'The Grandstand Open 2026: eight days of championship tennis.')">
+  <title>@yield('title', 'Jaya Tennis Championship 2026') — Jaya Tennis Championship</title>
+  <meta name="description" content="@yield('description', 'The Jaya Tennis Championship 2026: eight days of championship tennis.')">
 
   <link href="{{ \terre\Libraries\Asset::v('resources/assets/vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">

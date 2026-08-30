@@ -1,7 +1,7 @@
 @extends('tennis.layout')
 
-@section('title', 'Grandstand Open 2026 — International Tennis Championship')
-@section('description', 'The Grandstand Open 2026: eight days of championship tennis. Registration is open for singles, doubles and club team events.')
+@section('title', 'Overview')
+@section('description', 'The Jaya Tennis Championship 2026: eight days of championship tennis. Registration is open for singles, doubles and club team events.')
 
 @section('content')
 
@@ -11,7 +11,7 @@
       <div class="row align-items-center g-5">
         <div class="col-lg-7">
           <span class="eyebrow">12 &ndash; 19 October 2026 &middot; Senayan Courts</span>
-          <h1 class="hero__title">The Grandstand<br>Open <em>2026</em></h1>
+          <h1 class="hero__title">The Jaya Tennis<br>Championship <em>2026</em></h1>
           <p class="lede">
             Eight days of championship tennis on grass. Singles, doubles
             and club team events &mdash; open to registered players of every grade.
@@ -209,7 +209,7 @@
             </div>
             <div class="col-sm-6">
               <span class="eyebrow eyebrow--muted mb-1">Tournament office</span>
-              <p class="mb-0">entries@grandstandopen.id<br>+62 21 5555 0110</p>
+              <p class="mb-0">entries@jayatennis.id<br>+62 21 5555 0110</p>
             </div>
           </div>
         </div>

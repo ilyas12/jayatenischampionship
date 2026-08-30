@@ -7,18 +7,18 @@
 :root{
   --paper:#F4F2E9;
   --paper-2:#FCFBF6;
-  --ink:#0A4A2A;
-  --ink-soft:#456352;
-  --purple:#52307C;
-  --brass:#A98A3D;
+  --ink:#29413C;
+  --ink-soft:#4C6660;
+  --purple:#9F8C48;
+  --brass:#9F8C48;
   --line:#DFDACB;
   --line-strong:#C7BFA9;
 
   /* keraton layer — gilt, sogan brown, kawung batik tile */
-  --gilt:#C6A24A;
-  --gilt-soft:rgba(198,162,74,.28);
+  --gilt:#9F8C48;
+  --gilt-soft:rgba(159,140,72,.28);
   --sogan:#6B4A22;
-  --batik:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' stroke='%23C6A24A' stroke-width='1'%3E%3Cellipse cx='9' cy='18' rx='7.5' ry='9'/%3E%3Cellipse cx='27' cy='18' rx='7.5' ry='9'/%3E%3Cellipse cx='18' cy='9' rx='9' ry='7.5'/%3E%3Cellipse cx='18' cy='27' rx='9' ry='7.5'/%3E%3C/g%3E%3C/svg%3E");
+  --batik:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' stroke='%239F8C48' stroke-width='1'%3E%3Cellipse cx='9' cy='18' rx='7.5' ry='9'/%3E%3Cellipse cx='27' cy='18' rx='7.5' ry='9'/%3E%3Cellipse cx='18' cy='9' rx='9' ry='7.5'/%3E%3Cellipse cx='18' cy='27' rx='9' ry='7.5'/%3E%3C/g%3E%3C/svg%3E");
 
   --ff-display:"Cormorant Garamond", Georgia, "Times New Roman", serif;
   --ff-body:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -144,7 +144,7 @@ a:hover{ color:var(--purple); }
 .court__alley{ position:absolute; inset:6% 12%; border-left:2px solid rgba(246,243,236,.35); border-right:2px solid rgba(246,243,236,.35); }
 .court__ball{
   position:absolute; width:16px; height:16px; border-radius:50%;
-  background:#D8E64A; right:18%; top:32%; box-shadow:0 0 0 3px rgba(216,230,74,.25);
+  background:#D9DB55; right:18%; top:32%; box-shadow:0 0 0 3px rgba(217,219,85,.25);
 }
 
 /* ------------------------------ cards / lists ------------------------------ */
@@ -463,8 +463,8 @@ a:hover{ color:var(--purple); }
   align-items: center;
   justify-content: center;
   background: var(--paper, #f4f1ea);
-  border: 1px solid rgba(10, 74, 42, .18);
-  color: #0A4A2A;
+  border: 1px solid rgba(41, 65, 60, .18);
+  color: var(--ink);
 }
 
 /* Silhouette sits slightly muted so a real portrait always reads as the
@@ -478,7 +478,7 @@ a:hover{ color:var(--purple); }
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #F1EDE2;
+  background: var(--paper);
 }
 
 .member-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -494,7 +494,7 @@ a:hover{ color:var(--purple); }
    Every page stays in the nav through the whole event, so the phases with
    nothing to show need a real state rather than an empty container. */
 .phase-notice {
-  border: 1px dashed rgba(10, 74, 42, .28);
+  border: 1px dashed rgba(41, 65, 60, .28);
   background: rgba(255, 255, 255, .5);
   padding: 2rem 1.5rem;
   text-align: center;
@@ -507,8 +507,8 @@ a:hover{ color:var(--purple); }
    team's position, and the squad is the body of the page. */
 .team-hero {
   position: relative;
-  background: #0A4A2A;
-  color: #EDE8DC;
+  background: var(--ink);
+  color: var(--paper-2);
   padding: 2.5rem 0 2rem;
   overflow: hidden;
 }
@@ -558,10 +558,10 @@ a:hover{ color:var(--purple); }
   border: 1px solid rgba(237, 232, 220, .45);
 }
 
-.team-hero__tag--gilt { border-color: #D8E64A; color: #D8E64A; }
+.team-hero__tag--gilt { border-color: var(--gilt); color: var(--gilt); }
 
 /* Facts strip: hairline dividers rather than boxes, so it reads as one band. */
-.team-facts { background: #fff; border-bottom: 1px solid rgba(10, 74, 42, .12); }
+.team-facts { background: #fff; border-bottom: 1px solid rgba(41, 65, 60, .12); }
 
 .team-facts__grid {
   display: grid;
@@ -569,7 +569,7 @@ a:hover{ color:var(--purple); }
 }
 
 .team-fact { padding: 1.1rem 0; }
-.team-fact + .team-fact { border-left: 1px solid rgba(10, 74, 42, .12); padding-left: 1.25rem; }
+.team-fact + .team-fact { border-left: 1px solid rgba(41, 65, 60, .12); padding-left: 1.25rem; }
 
 .team-fact__label { display: block; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
 .team-fact__value { display: block; font-size: 1.6rem; line-height: 1.2; margin-top: .2rem; }
@@ -582,7 +582,7 @@ a:hover{ color:var(--purple); }
   gap: 1.25rem;
 }
 
-.squad-card { border: 1px solid rgba(10, 74, 42, .16); background: #fff; }
+.squad-card { border: 1px solid rgba(41, 65, 60, .16); background: #fff; }
 
 .squad-card__photo {
   /* Portrait, so a real headshot crops the way a squad photo should. */
@@ -620,7 +620,7 @@ a:hover{ color:var(--purple); }
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #F1EDE2;
+  background: var(--paper);
 }
 
 /* ---- Homepage clubs strip -----------------------------------------------
@@ -633,18 +633,18 @@ a:hover{ color:var(--purple); }
   gap: .45rem;
   height: 100%;
   padding: 1rem .9rem;
-  border: 1px solid rgba(10, 74, 42, .16);
+  border: 1px solid rgba(41, 65, 60, .16);
   background: #fff;
   text-decoration: none;
   transition: border-color .15s ease;
 }
 
-.club-tile:hover { border-color: rgba(10, 74, 42, .45); }
+.club-tile:hover { border-color: rgba(41, 65, 60, .45); }
 
 .club-tile__crest {
   align-self: flex-start;
   padding: .2rem .5rem;
-  border: 1px solid rgba(10, 74, 42, .35);
+  border: 1px solid rgba(41, 65, 60, .35);
   font-size: .72rem;
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -652,3 +652,15 @@ a:hover{ color:var(--purple); }
 
 .club-tile__name { font-size: .95rem; line-height: 1.25; }
 .club-tile__city { font-size: .78rem; opacity: .65; }
+
+/* ---- Brand marks ---------------------------------------------------------
+   The JC monogram in the header, the club crest in the footer. Both are raster
+   logos supplied by the client, sized down from 1000px+ originals. */
+.brand__mark { width: 40px; height: 40px; object-fit: contain; }
+
+.footer-crest {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}

@@ -6,7 +6,7 @@
 @extends('tennis.layout')
 
 @section('title', 'Order of play')
-@section('description', 'Order of play for the Grandstand Open — session times, courts and entry notes.')
+@section('description', 'Order of play for the Jaya Tennis Championship — session times, courts and entry notes.')
 
 @section('content')
 

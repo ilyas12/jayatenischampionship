@@ -11,7 +11,7 @@
 @extends('tennis.layout')
 
 @section('title', $team->name)
-@section('description', $team->name . ' — squad and results at the Grandstand Open.')
+@section('description', $team->name . ' — squad and results at the Jaya Tennis Championship.')
 
 @section('content')
 

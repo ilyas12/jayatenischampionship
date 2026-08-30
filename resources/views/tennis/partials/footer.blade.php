@@ -3,8 +3,13 @@
   <div class="container-xl">
     <div class="row g-5">
       <div class="col-lg-4">
-        <h4>Grandstand Open</h4>
-        <p class="mb-0" style="max-width:38ch">An open championship held every October at the Senayan Courts since 1974.</p>
+        {{-- The club crest belongs to the organiser; the JC mark in the header
+             belongs to the championship itself. --}}
+        <img class="footer-crest"
+             src="{{ \terre\Libraries\Asset::v('resources/assets/tennis/img/brand/hjtc-crest.png') }}"
+             alt="HIPMI Jaya Tennis Club" width="360" height="360">
+        <h4>Jaya Tennis Championship</h4>
+        <p class="mb-0" style="max-width:38ch">Hosted by HIPMI Jaya Tennis Club at the Senayan Courts.</p>
       </div>
       <div class="col-6 col-lg-2">
         <span class="eyebrow">Tournament</span>
@@ -26,13 +31,12 @@
       </div>
       <div class="col-lg-4">
         <span class="eyebrow">Tournament office</span>
-        <p class="mb-1"><a href="mailto:entries@grandstandopen.id">entries@grandstandopen.id</a></p>
+        <p class="mb-1"><a href="mailto:entries@jayatennis.id">entries@jayatennis.id</a></p>
         <p class="mb-0">Jl. Pintu Satu Senayan, Jakarta Pusat 10270</p>
       </div>
     </div>
     <div class="footer-bottom d-flex flex-wrap justify-content-between gap-2">
-      <span>&copy; 2026 Grandstand Open. All rights reserved.</span>
-      <span>Design template &mdash; ready for Laravel Blade.</span>
+      <span>&copy; 2026 Jaya Tennis Championship. All rights reserved.</span>
     </div>
   </div>
 </footer>

@@ -1,7 +1,7 @@
 @extends('tennis.layout')
 
-@section('title', 'Teams &amp; Players — Grandstand Open 2026')
-@section('description', 'The sixteen clubs and their registered players for the Grandstand Open 2026.')
+@section('title', 'Teams and players')
+@section('description', 'The sixteen clubs and their registered players for the Jaya Tennis Championship 2026.')
 
 @section('content')
 
