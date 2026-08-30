@@ -81,6 +81,55 @@
     </div>
   </section>
 
+  <!-- ==================== CLUBS ==================== -->
+  <section class="section" id="clubs">
+    <div class="container-xl">
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-5">
+        <div>
+          <span class="eyebrow">Clubs</span>
+          <h2 class="mb-0">
+            @if ($clubCount)
+              {{ $clubCount }} {{ \Illuminate\Support\Str::plural('club', $clubCount) }}
+              {{ $event && $event->acceptsEntries() ? 'entered so far' : 'in the field' }}.
+            @else
+              The field is still open.
+            @endif
+          </h2>
+        </div>
+        @if ($clubCount)
+          <a href="{{ route('tennis_teams') }}" class="btn btn-outline-ink">All teams and players</a>
+        @endif
+      </div>
+
+      @if ($clubCount)
+        {{-- Crest, name, city — enough to recognise a club. The full card, with
+             squad and seeding, lives on the teams page. --}}
+        <div class="row g-4">
+          @foreach ($teams as $team)
+            <div class="col-6 col-md-4 col-lg-2">
+              <a class="club-tile" href="{{ route('tennis_team', $team->permalink) }}">
+                <span class="club-tile__crest">{{ $team->short_code ?: mb_substr($team->name, 0, 3) }}</span>
+                <span class="club-tile__name">{{ $team->name }}</span>
+                @if ($team->city)
+                  <span class="club-tile__city">{{ $team->city }}</span>
+                @endif
+              </a>
+            </div>
+          @endforeach
+        </div>
+      @else
+        <div class="phase-notice">
+          <h3 class="h5 mb-2">No clubs have entered yet</h3>
+          <p class="text-soft mb-0">Entries appear here as they are confirmed.</p>
+          @if ($event && $event->acceptsEntries())
+            <a href="{{ route('tennis_registration') }}" class="btn btn-ink mt-3">Enter the tournament</a>
+          @endif
+        </div>
+      @endif
+    </div>
+  </section>
+
+
   <!-- ==================== SCHEDULE ==================== -->
   <section class="section" id="schedule">
     <div class="container-xl">

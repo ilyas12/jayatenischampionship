@@ -51,6 +51,13 @@ done
 
 # Teams page reads event_teams, so a published team must show up on it.
 head_ "Teams from the CMS"
+# The homepage carries a clubs strip that links into the teams page.
+if curl -s --max-time 30 "$BASE/tennis" | grep -qE 'club-tile|No clubs have entered'; then
+    ok "homepage clubs strip renders or explains itself"
+else
+    bad "homepage clubs strip missing"
+fi
+
 if curl -s --max-time 30 "$BASE/tennis/teams" | grep -q 'id="teamGrid"'; then
     ok "teams grid renders"
 else

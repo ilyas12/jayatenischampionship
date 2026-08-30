@@ -54,6 +54,9 @@ class Tennis extends Controller
             'schedule'     => $schedule,
             'categories'   => $categories,
             // Hero counters, all from the event's own data.
+            // The strip shows a handful and links through; the counter above
+            // it still reports the full field.
+            'teams'        => $teams->take(6),
             'clubCount'    => $teams->count(),
             'playerCount'  => $teams->sum(function ($team) { return count($team->member_list); }),
             'dayCount'     => $schedule->pluck('starts_on')->filter()->unique()->count(),
