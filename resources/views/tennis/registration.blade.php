@@ -32,7 +32,14 @@
 
         <div class="col-lg-8">
           <!-- Blade: <form method="POST" action=" route('registration.store') " ...> csrf -->
-          <form id="registrationForm" class="needs-validation" action="#" method="post" novalidate>
+          <form id="registrationForm" class="needs-validation" method="post"
+                action="{{ route('event_register', 'grandstand-open-2026') }}" novalidate>
+            @csrf
+            @if ($errors->any())
+              <div class="alert alert-danger">
+                <ul class="mb-0">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+              </div>
+            @endif
 
             <!-- ---------- 1. Event ---------- -->
             <div class="fieldset-head">
@@ -79,26 +86,26 @@
               <div class="col-md-8">
                 <label for="team_name" class="form-label">Team or club name <span aria-hidden="true">*</span></label>
                 <!-- Blade: value=" old('team_name') " error('team_name') is-invalid enderror -->
-                <input type="text" class="form-control" id="team_name" name="team_name" placeholder="e.g. Senayan Racquet Club" required>
+                <input type="text" class="form-control" id="team_name" name="team_name" placeholder="e.g. Senayan Racquet Club" required value="{{ old('team_name') }}">
                 <div class="invalid-feedback">A team name is required.</div>
               </div>
               <div class="col-md-4">
                 <label for="team_short" class="form-label">Short code</label>
-                <input type="text" class="form-control" id="team_short" name="team_short" maxlength="4" placeholder="SRC">
+                <input type="text" class="form-control" id="team_short" name="team_short" maxlength="4" placeholder="SRC" value="{{ old('team_short') }}">
                 <div class="form-text">Up to four letters, shown on the draw.</div>
               </div>
               <div class="col-md-6">
                 <label for="city" class="form-label">City <span aria-hidden="true">*</span></label>
-                <input type="text" class="form-control" id="city" name="city" placeholder="Jakarta" required>
+                <input type="text" class="form-control" id="city" name="city" placeholder="Jakarta" required value="{{ old('city') }}">
                 <div class="invalid-feedback">Please enter a city.</div>
               </div>
               <div class="col-md-6">
                 <label for="founded" class="form-label">Club founded</label>
-                <input type="number" class="form-control" id="founded" name="founded" min="1850" max="2026" placeholder="1988">
+                <input type="number" class="form-control" id="founded" name="founded" min="1850" max="2026" placeholder="1988" value="{{ old('founded') }}">
               </div>
               <div class="col-12">
                 <label for="notes" class="form-label">Notes for the referee</label>
-                <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Scheduling requests, accessibility needs, travelling distance&hellip;"></textarea>
+                <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Scheduling requests, accessibility needs, travelling distance&hellip;">{{ old('notes') }}</textarea>
               </div>
             </div>
 
@@ -111,22 +118,22 @@
             <div class="row g-4 mt-1">
               <div class="col-md-6">
                 <label for="captain_name" class="form-label">Full name <span aria-hidden="true">*</span></label>
-                <input type="text" class="form-control" id="captain_name" name="captain_name" required>
+                <input type="text" class="form-control" id="captain_name" name="captain_name" required value="{{ old('captain_name') }}">
                 <div class="invalid-feedback">Please enter the captain&rsquo;s name.</div>
               </div>
               <div class="col-md-6">
                 <label for="captain_email" class="form-label">Email <span aria-hidden="true">*</span></label>
-                <input type="email" class="form-control" id="captain_email" name="captain_email" placeholder="name@club.id" required>
+                <input type="email" class="form-control" id="captain_email" name="captain_email" placeholder="name@club.id" required value="{{ old('captain_email') }}">
                 <div class="invalid-feedback">Please enter a valid email address.</div>
               </div>
               <div class="col-md-6">
                 <label for="captain_phone" class="form-label">Mobile <span aria-hidden="true">*</span></label>
-                <input type="tel" class="form-control" id="captain_phone" name="captain_phone" placeholder="+62 812 0000 0000" required>
+                <input type="tel" class="form-control" id="captain_phone" name="captain_phone" placeholder="+62 812 0000 0000" required value="{{ old('captain_phone') }}">
                 <div class="invalid-feedback">Please enter a contact number.</div>
               </div>
               <div class="col-md-6">
                 <label for="captain_id" class="form-label">Federation ID</label>
-                <input type="text" class="form-control" id="captain_id" name="captain_id" placeholder="PELTI-000000">
+                <input type="text" class="form-control" id="captain_id" name="captain_id" placeholder="PELTI-000000" value="{{ old('captain_id') }}">
               </div>
             </div>
 

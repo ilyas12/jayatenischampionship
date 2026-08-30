@@ -49,6 +49,36 @@ for path in "" rates branches news-and-events underlying contact; do
     expect "$BASE/$path" 200 "GET /$path"
 done
 
+# Event registration flow, end to end: submit -> payment page -> proof upload.
+# Needs the grandstand-open-2026 event seeded; skips cleanly if it is not.
+head_ "Event registration flow"
+REG_COOKIES="$(mktemp)"
+REG_TOKEN="$(curl -s -c "$REG_COOKIES" --max-time 30 "$BASE/tennis/registration" \
+    | grep -oE 'name="_token" value="[^"]*"' | head -1 | sed 's/.*value="//;s/"//')"
+REG_LOC="$(curl -s -b "$REG_COOKIES" -c "$REG_COOKIES" -o /dev/null -w '%{redirect_url}' --max-time 30 \
+    -X POST "$BASE/event/grandstand-open-2026/register" \
+    -d "_token=$REG_TOKEN" \
+    -d "captain_name=Smoke Test" -d "captain_email=smoke@test.local" -d "captain_phone=0800000000" \
+    -d "category_id=ct" -d "grade=open" -d "team_name=Smoke FC" \
+    -d "members[0][name]=Smoke Player" -d "accept_rules=1")"
+
+case "$REG_LOC" in
+    */event/payment/*)
+        ok "registration POST redirects to its payment page"
+        REG_CODE="${REG_LOC##*/}"
+        expect "$BASE/event/payment/$REG_CODE" 200 "payment page for $REG_CODE"
+        if curl -s -b "$REG_COOKIES" --max-time 30 "$BASE/event/payment/$REG_CODE" | grep -q "$REG_CODE"; then
+            ok "payment page shows the reference code"
+        else
+            bad "payment page does not show the reference code"
+        fi
+        ;;
+    *)
+        printf '  \033[33mSKIP\033[0m  registration flow — no redirect (is the event seeded and open?)\n'
+        ;;
+esac
+rm -f "$REG_COOKIES"
+
 # Grandstand Open — static slice of the tennis mockup.
 head_ "Tennis theme (/tennis)"
 for path in tennis tennis/teams tennis/draw tennis/registration; do

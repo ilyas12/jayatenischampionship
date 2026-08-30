@@ -144,6 +144,13 @@ $router->group([
 
     Route::get('/', array('as' => 'home_terre', 'uses' => 'HomePage@index_dsv2'));
     /**
+     * Event registration — generic, keyed by event slug and registration code.
+     */
+    Route::post('/event/{slug}/register', array('as' => 'event_register', 'uses' => 'EventRegistration@store'));
+    Route::get('/event/payment/{code}', array('as' => 'event_payment', 'uses' => 'EventRegistration@confirm'));
+    Route::post('/event/payment/{code}', array('as' => 'event_payment_upload', 'uses' => 'EventRegistration@upload'));
+
+    /**
      * Grandstand Open — static slice of the tennis mockup, on its own prefix so
      * it cannot collide with the live site's routes.
      */
