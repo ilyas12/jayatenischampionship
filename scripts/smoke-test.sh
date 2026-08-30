@@ -111,6 +111,19 @@ case "$REG_LOC" in
 esac
 rm -f "$REG_COOKIES"
 
+# The suite creates a real registration every run. Delete it again, or the admin
+# list fills up with test entries. Keyed on the code it just received, so a run
+# only ever removes its own row. Skipped when the database is not reachable —
+# the flow above still works against a remote environment, the tidy-up does not.
+if [ -n "${REG_CODE:-}" ] && docker compose ps db >/dev/null 2>&1; then
+    if docker compose exec -T db mysql -ucms -psecret cms_template_engine \
+        -e "DELETE FROM terre217_event_registrations WHERE code = '${REG_CODE}';" >/dev/null 2>&1; then
+        ok "cleaned up its own registration ($REG_CODE)"
+    else
+        bad "could not delete registration $REG_CODE — it will linger in the admin list"
+    fi
+fi
+
 # Grandstand Open — static slice of the tennis mockup.
 head_ "Tennis theme (/tennis)"
 for path in tennis tennis/teams tennis/draw tennis/registration; do
