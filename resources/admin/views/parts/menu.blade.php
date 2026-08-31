@@ -184,7 +184,7 @@
                     <li class="dropdown">
                         <a href="{{ URL::route('admin_static_page') }}">Pages</a>
                     </li>
-                   {--<li class="dropdown">
+                   {{--<li class="dropdown">
                        <a href="#">Static Page</a>
                        <ul>
                            <li><a href="{{ URL::route('admin_static_page_on_menu') }}">On Hide</a></li>
