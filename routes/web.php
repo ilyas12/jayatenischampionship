@@ -27,25 +27,6 @@ $router->group([
         Route::any('/slideshow', array('as' => 'admin_slideshow', 'uses' => 'Slideshow@index'));
         Route::any('/banner', array('as' => 'admin_banner', 'uses' => 'Banner@index'));
         Route::any('/home_video', array('as' => 'admin_home_video', 'uses' => 'Content@video'));
-        Route::any('/brand', array('as' => 'admin_brand', 'uses' => 'Brand@index'));
-
-        // PRODUCTS
-        Route::any('/products-by-category', array('as' => 'admin_products_by_category', 'uses' => 'ProductByCategory@index'));
-        Route::any('/products-image-category', array('as' => 'admin_products_image_category', 'uses' => 'ProductImageByCategory@index'));
-        Route::any('/products-by-subcategory', array('as' => 'admin_products_by_subcategory', 'uses' => 'ProductBySubCategory@index'));
-        Route::any('/products-image-subcategory', array('as' => 'admin_products_image_subcategory', 'uses' => 'ProductImageBySubCategory@index'));
-        Route::any('/products-by-brand', array('as' => 'admin_products_by_brand', 'uses' => 'ProductByBrand@index'));
-        Route::any('/products-image-brand', array('as' => 'admin_products_image_brand', 'uses' => 'ProductImageByBrand@index'));
-        Route::any('/products', array('as' => 'admin_products', 'uses' => 'Product@index'));
-        Route::any('/products-image', array('as' => 'admin_products_image', 'uses' => 'ProductImage@index'));
-
-        // PROJECT
-        Route::any('/projects-by-category', array('as' => 'admin_projects_by_category', 'uses' => 'ProjectByCategory@index'));
-        Route::any('/projects-image-category', array('as' => 'admin_projects_image_category', 'uses' => 'ProjectImageByCategory@index'));
-        Route::any('/projects-by-subcategory', array('as' => 'admin_projects_by_subcategory', 'uses' => 'ProjectBySubCategory@index'));
-        Route::any('/projects-image-subcategory', array('as' => 'admin_projects_image_subcategory', 'uses' => 'ProjectImageBySubCategory@index'));
-        Route::any('/projects', array('as' => 'admin_projects', 'uses' => 'Project@index'));
-        Route::any('/projects-image', array('as' => 'admin_projects_image', 'uses' => 'ProjectImage@index'));
 
         // NEWS AND EVENTS
         Route::any('/news-and-event-by-category', array('as' => 'admin_news-and-event-by-category', 'uses' => 'NewsAndEventsByCategory@index'));
@@ -64,19 +45,6 @@ $router->group([
         // GALLERIES
         Route::any('/galleries-by-category', array('as' => 'admin_galleries-by-category', 'uses' => 'GalleriesByCategory@index'));
         Route::any('/galleries', array('as' => 'admin_galleries', 'uses' => 'Galleries@index'));
-
-        // PRESS
-        Route::any('/press-by-category', array('as' => 'admin_press_by_category', 'uses' => 'PressByCategory@index'));
-        Route::any('/press', array('as' => 'admin_press', 'uses' => 'Press@index'));
-        Route::any('/press/album', array('as' => 'admin_press_album', 'uses' => 'PressAlbum@index'));
-
-        // STORES
-        Route::any('/location', array('as' => 'admin_location', 'uses' => 'Location@index'));
-        Route::any('/stores-by-location', array('as' => 'admin_store_by_location', 'uses' => 'StoreByLocation@index'));
-        Route::any('/stores', array('as' => 'admin_store', 'uses' => 'Store@index'));
-
-        // TESTIMONIALS
-        Route::any('/testimonials', array('as' => 'admin_testimonial', 'uses' => 'Testimonials@index'));
 
         // TEAM PROFILE
         // Route::any('/team-profile', array('as' => 'admin_team-profile', 'uses' => 'TeamProfile@index'));

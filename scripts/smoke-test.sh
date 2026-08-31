@@ -225,7 +225,9 @@ if curl -s -b "$COOKIES" --max-time 30 "$BASE/$ADMIN_PREFIX/setting" | grep -q "
 
     # These pages between them exercise every Form:: helper the app uses:
     # open/close, text, textarea, select, label, checkbox, radio and hidden.
-    for path in setting about news-and-event administrator location contact_address; do
+    for path in setting about news-and-event administrator contact_address \
+                events event_categories event_registrations event_teams \
+                event_team_members event_schedule event_matches; do
         expect_auth "$BASE/$ADMIN_PREFIX/$path" 200 "GET admin /$path"
     done
 
