@@ -1,8 +1,9 @@
 # CMS Template Engine
 
-The Laravel CMS behind **Dua Sisi Money Changer** (`duasisimoneychanger.co.id`) —
-exchange rates, branches, news and events, and static pages, with a custom admin
-panel behind an obfuscated URL prefix.
+The Laravel CMS behind the **Jaya Tennis Championship** — the public tournament
+site at the document root, and an event registration module that takes entries,
+issues payment instructions, and turns paid entries into the teams, draw and
+results the site publishes.
 
 | | |
 | --- | --- |
@@ -15,10 +16,23 @@ panel behind an obfuscated URL prefix.
 Originally Laravel 5.4 on PHP 5.6; migrated one minor version at a time. See
 [Upgrade history](#upgrade-history).
 
+### Two halves, different rules
+
+The **front-end is single-purpose**: it serves the tournament and nothing else.
+Earlier front-ends — a money changer and a foundation site — have been removed,
+and their routes, controllers and views with them.
+
+The **admin is a general CMS**, carried between projects. It ships modules this
+tournament does not use — products, projects, press, stores, testimonials,
+galleries, services. They are the template's inventory, not dead code; a module
+having no public page here is not a reason to remove it. Clean up the front-end;
+leave the admin alone.
+
 ---
 
 ## Table of contents
 
+- [The tournament site](#the-tournament-site)
 - [Local development](#local-development)
 - [Production](#production)
 - [Configuration reference](#configuration-reference)
@@ -27,6 +41,62 @@ Originally Laravel 5.4 on PHP 5.6; migrated one minor version at a time. See
 - [Project layout](#project-layout)
 - [Troubleshooting](#troubleshooting)
 - [Upgrade history](#upgrade-history)
+
+---
+
+## The tournament site
+
+Six public routes, all at the root, all in `app/Http/Controllers/Tennis.php`
+against `resources/views/tennis/`:
+
+| Route | Name | Shows |
+| --- | --- | --- |
+| `/` | `tennis_home` | Hero counters, categories, featured teams — all derived from the current event |
+| `/teams` | `tennis_teams` | Clubs entered, filterable |
+| `/teams/{permalink}` | `tennis_team` | One club: squad with photos, record, ties |
+| `/draw` | `tennis_bracket` | Bracket per category, plus the results board |
+| `/schedule` | `tennis_schedule` | Order of play |
+| `/registration` | `tennis_registration` | Entry form |
+
+### Phases
+
+An event moves through four phases, set by an admin on the event record. The
+phase decides what the public site will show; **no page ever disappears from the
+navigation**, it explains itself instead.
+
+| Phase | Entries | Draw | Results |
+| --- | --- | --- | --- |
+| `registration` | open | hidden | hidden |
+| `draw` | closed | published | hidden |
+| `running` | closed | published | appear as ties are played |
+| `finished` | closed | published | complete, champion decided |
+
+Entries also respect the event's own date window, so `registration` alone does
+not keep a closed event open.
+
+### Registration flow
+
+```
+entrant submits /registration
+   └─ POST /event/{slug}/register        pending
+      └─ payment instructions emailed, quoting a registration code
+         └─ GET  /event/payment/{code}   entrant uploads proof
+            └─ POST same route           awaiting_verification
+               └─ admin verifies in the CMS
+                  └─ paid  ──▶ team appears on the public site
+```
+
+Reaching `paid` creates the club and its squad automatically. Losing that status
+unpublishes the team rather than deleting it, so an admin's later work — seed,
+group, photos — is never destroyed by a status change. Codes are random, not
+sequential, because the confirmation page is reachable by code alone.
+
+### Derived, not stored
+
+Team status, match winners, the champion and the hero counters are **computed
+from `event_matches` and the event record** on each request. There is no
+"champion" column to forget to update, and no way for a stored summary to
+disagree with the ties it summarises.
 
 ---
 
@@ -41,10 +111,16 @@ Composer or MySQL. `vendor/` is installed inside the image.
 
 ```bash
 docker compose up -d --build
+docker compose exec app php artisan migrate
 ```
 
 First run takes a few minutes: it builds the PHP image, imports the SQL dump and
 converts the schema. Subsequent starts take seconds.
+
+**The `migrate` step is not optional on a fresh volume.** The SQL dump predates
+the tournament, so it has no `event*` tables; the entrypoint does not migrate,
+and every tournament page queries them. Skip it and the site answers 500 until
+you run it.
 
 | Service | URL | Credentials |
 | --- | --- | --- |
@@ -173,10 +249,19 @@ idea. Point `DB_HOST` at a managed instance or a separately managed container.
 To create the schema, apply the three files in the order given under
 [The database](#the-database). Keep `DB_PREFIX=terre217_`.
 
-**Rotate the credentials in `.env`.** The committed `.env` contains live
-database and Gmail credentials, and the document root serves the project root,
-so on a host without the deny rules in `docker/apache/vhost.conf` they are
-reachable over HTTP. Treat them as compromised.
+**Fill in `.env`, and rotate what used to be in it.** `.env` is untracked and
+its credentials are placeholders — `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`,
+`MAIL_HOST` and `MAIL_PASSWORD` all read `CHANGE_ME_*`, so a deploy fails loudly
+rather than connecting somewhere unintended. The credentials that used to sit
+there and in `.env.prod.example` are in the git history and should be treated as
+compromised.
+
+Bear in mind the document root serves the project root, so on any host without
+the deny rules in `docker/apache/vhost.conf`, `.env` is reachable over HTTP.
+
+**Check the from-address.** `MAIL_FROM_ADDRESS` must be a mailbox the SMTP
+account is allowed to send as, or the provider will rewrite or reject it — and
+that address is what every registration payment instruction goes out under.
 
 **Persist uploads.** Two named volumes, `uploads` and `storage`, hold everything
 the container writes. Without them every image uploaded through the CMS is lost
@@ -206,10 +291,13 @@ this in mind before adding any new `env()` call outside `config/`.
 | `APP_ENV` | `docker` | Selects which `.env.<APP_ENV>` file is read |
 | `APP_KEY` | committed dev key | **Must** be unique per deployment |
 | `APP_DEBUG` | `true` | `false` in production, always |
-| `APP_URL` | `http://localhost:8088` | Builds admin page permalinks |
+| `APP_URL` | `http://localhost:8088` | Admin page permalinks, and the filemanager's base URL. No trailing slash |
 | `DB_PREFIX` | `terre217_` | The existing schema is prefixed; do not drop this |
 | `LOG_CHANNEL` | `stack` | `stderr` in production, for `docker logs` |
-| `MAIL_DRIVER` | `log` | Locally, mail is written to `storage/logs` |
+| `LOG_LEVEL` | `debug` | `error` in production. `APP_LOG_LEVEL` is a Laravel 5.x key and is no longer read |
+| `MAIL_DRIVER` | `log` | Locally, mail is written to `storage/logs`. **`config/mail.php` reads this, not `MAIL_MAILER`** — keep both in step |
+| `MAIL_FROM_ADDRESS` | `no-reply@localhost` | The address registration emails are sent from |
+| `MAIL_FROM_NAME` | `CMS Template Engine` | Display name on the same |
 
 Production reads its values from the environment via `--env-file`, so nothing
 secret is committed. Local values live in `.env.docker`.
@@ -226,6 +314,18 @@ The dev `db` volume is seeded on first boot from three files, in order:
 | `docker/mysql/init/02-modernize-schema.sql` | MyISAM → InnoDB, utf8mb3 → utf8mb4 |
 | `docker/mysql/init/03-zero-dates.sql` | Zero dates → `NULL` |
 
+The seven `event*` tables are **not** in that dump — they postdate it, and are
+created by the only migrations this project owns:
+
+```bash
+docker compose exec app php artisan migrate
+```
+
+Beyond those, `database/migrations/` holds only the three stock Laravel tables
+(`users`, `password_resets`, `personal_access_tokens`). The other 58 tables are
+the dump's, and no migration reproduces them — do not expect a migration to
+build this schema from nothing.
+
 Both migration scripts are idempotent, so they can be applied by hand — this is
 also how you would prepare a production database:
 
@@ -233,20 +333,21 @@ also how you would prepare a production database:
 docker compose exec -T db mysql -ucms -psecret cms_template_engine < docker/mysql/init/02-modernize-schema.sql
 ```
 
-Rebuild from scratch, destroying all local data:
+Rebuild from scratch, destroying all local data. The `migrate` is required — a
+new volume is seeded from the dump alone, which has no `event*` tables:
 
 ```bash
 docker compose down -v && docker compose up -d
+docker compose exec app php artisan migrate
 ```
 
 ### Strict mode
 
-The application connection runs a strict `sql_mode`, pinned explicitly in
-`config/database.php`. It keeps `STRICT_TRANS_TABLES` and `NO_ZERO_DATE` but
-omits `ONLY_FULL_GROUP_BY`, which is a query-style rule rather than a
-data-integrity one: several legacy `GROUP BY` queries select columns they do not
-group by, and the homepage's product-category listing returns a 500 under it.
-Fixing those queries and dropping the `modes` key is outstanding work.
+The application connection runs Laravel's **full** strict `sql_mode`,
+`ONLY_FULL_GROUP_BY` included. `config/database.php` used to pin the modes by
+hand to drop that one rule, because the old front-end's product-category listing
+selected columns it did not group by. That query went with the front-end, so the
+override went too.
 
 The *server* `sql_mode` in `docker/mysql/my.cnf` stays permissive, because the
 dump itself cannot be imported under `NO_ZERO_DATE`. The app's own connection is
@@ -260,11 +361,13 @@ strict regardless.
 ./scripts/smoke-test.sh
 ```
 
-33 checks against a running stack: public routes, a database-backed news detail
-page, static assets, error handling, admin login and CSRF, six authenticated
-admin screens, the Imagine thumbnail and effects pipeline, the vhost deny rules,
-and a scan for PHP errors leaking into responses. Run it after any dependency or
-configuration change.
+53 checks against a running stack: the six tournament routes, the teams and draw
+pages against real data, an unknown team slug returning 404, the full
+registration round trip (which cleans up the registrations it creates), static
+assets, error handling, admin login and CSRF, twelve authenticated admin screens
+including every event module, the Imagine thumbnail and effects pipeline, the
+vhost deny rules, and a scan for PHP errors leaking into responses. Run it after
+any dependency or configuration change.
 
 Point it at another environment by passing a base URL:
 
@@ -288,9 +391,13 @@ Two checks exist because of bugs that passed everything else:
 ```
 app/
   Admin/          Admin panel controllers, models, middleware
-  Http/           Public site controllers and models
+  Http/
+    Controllers/  Tennis.php, EventRegistration.php, Auth/
+    Models/       Event*Model — shared with the admin's event modules
   Libraries/      Local replacements for removed framework pieces
 config/
+database/
+  migrations/     The event tables only; the rest of the schema is the SQL dump
 docker/
   apache/         vhost, including the deny rules
   mysql/          my.cnf and the two schema migrations
@@ -298,10 +405,19 @@ docker/
 resources/
   admin/views/    Admin panel Blade templates
   assets/         CSS, JS, images and uploads — served publicly
-  views/          Public site Blade templates
-routes/web.php    Admin routes are prefixed; public routes are `_dsv2` methods
+    tennis/       Tournament CSS, JS and imagery
+  views/
+    tennis/       Tournament templates
+    emails/       Payment instructions
+    events/       Payment confirmation and proof upload
+routes/web.php    Admin routes sit behind the obfuscated prefix; the tournament
+                  is at the root
 scripts/          smoke-test.sh, seed-test-admin.sh
 ```
+
+The admin's event modules and the public site share one set of models under
+`app/Http/Models/`, so a rule such as "losing paid status unpublishes the team"
+holds no matter which side of the CMS makes the change.
 
 ### Document root
 
@@ -317,8 +433,10 @@ and `*.log`. `resources/assets/` stays public, as the app requires. **Any host
 serving this project without equivalent rules exposes `.env`.**
 
 Moving to a `public/` document root is the conventional fix, but it means
-relocating `resources/assets`, updating `asset()` calls across 44 views and the
-admin upload paths, and matching changes on the host. It has not been done.
+relocating `resources/assets`, updating the 21 views that reference it — the
+tournament templates go through `terre\Libraries\Asset::v()`, which also appends
+an mtime cache-buster — along with the admin upload paths, and matching changes
+on the host. It has not been done.
 
 ---
 
