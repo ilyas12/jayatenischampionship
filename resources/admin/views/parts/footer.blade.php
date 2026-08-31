@@ -2,7 +2,7 @@
 	<div class="footer-border">
 		<div class="container">
 			<p id="copyright">&copy; Copyright Outpost Interactive 2010-<?php echo date("Y")?>. All Rights Reserved.</p>
-		    <p id="powered">Powered by Outpost Interactive</p>
+		    <p id="powered">Powered by dailydoze</p>
 		</div>
 	</div>
 </div>

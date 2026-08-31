@@ -3,11 +3,36 @@ session_start();
 mb_internal_encoding('UTF-8');
 
 $path           = dirname(__FILE__)."../../../../";
-//$servername     = "http://" . $_SERVER['SERVER_NAME'];
-//$project        = explode('/', $_SERVER['REQUEST_URI'])[1];
-//$url            = $servername.'/'.$project;
-//$url            = "http://localhost/terre";
-$url              = "https://duasisimoneychanger.co.id";
+
+// This filemanager runs outside the framework — no container, so no config()
+// — but it still has to agree with Laravel about where the site lives, or the
+// URLs it hands back point at the wrong host. So resolve APP_URL the way
+// Laravel would: a real environment variable first, then the env file, then
+// the request itself.
+$url = getenv('APP_URL');
+
+if (! $url) {
+    // Laravel loads .env.<APP_ENV> in preference to .env when APP_ENV is set
+    // in the real environment, which is how the Docker stack keeps the
+    // deployed .env on disk untouched. Read whichever file the app read.
+    $root = dirname(__FILE__).'/../../../../../';
+    $env  = getenv('APP_ENV');
+
+    foreach (($env ? array($root.'.env.'.$env, $root.'.env') : array($root.'.env')) as $envFile) {
+        if (is_readable($envFile)
+            && preg_match('/^APP_URL\s*=\s*(.*)$/m', file_get_contents($envFile), $m)) {
+            $url = trim(trim(trim($m[1]), '"\''));
+            break;
+        }
+    }
+}
+
+if (! $url) {
+    $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $url    = $scheme.'://'.(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
+}
+
+$url = rtrim($url, '/');
 //------------------------------------------------------------------------------
 // DON'T COPY THIS VARIABLES IN FOLDERS config.php FILES
 //------------------------------------------------------------------------------
