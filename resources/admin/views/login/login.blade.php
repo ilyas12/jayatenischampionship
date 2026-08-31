@@ -19,7 +19,7 @@
 <body id="body_colour">
 	<div id="header_login">
 		<center>
-	    	<img src="{{ URL::asset('resources/assets/images/'.$website_logo) }}" style="max-height:100px;">
+	    	<img src="{{ URL::asset('resources/assets/images/'.$login_admin_logo) }}" style="max-height:100px;">
 	    </center>
 	    <p>ADMIN LOGIN ACCESS</p>
 	</div>
@@ -38,6 +38,6 @@
 
 		{!! Form::close() !!}
 	</div>
-	<div id="footer_login">Powered by DUASISI</div>
+	<div id="footer_login">Powered by dailydoze</div>
 </body>
 </html>
