@@ -112,15 +112,23 @@ Composer or MySQL. `vendor/` is installed inside the image.
 ```bash
 docker compose up -d --build
 docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
 ```
 
 First run takes a few minutes: it builds the PHP image, imports the SQL dump and
 converts the schema. Subsequent starts take seconds.
 
-**The `migrate` step is not optional on a fresh volume.** The SQL dump predates
-the tournament, so it has no `event*` tables; the entrypoint does not migrate,
-and every tournament page queries them. Skip it and the site answers 500 until
-you run it.
+**Neither of those two steps is optional on a fresh volume.** The SQL dump
+predates the tournament, so it has no `event*` tables and no tournament in them;
+the entrypoint runs neither command, and every tournament page queries those
+tables. Skip the migrate and the site answers 500; skip the seed and it comes up
+correct but empty, every page in its no-data state.
+
+`db:seed` runs `TournamentSeeder` — one event, eight clubs with their squads,
+six categories, a complete eight-team draw with results, and five schedule days.
+It keys on the event slug and rebuilds only that event's rows, so it is safe to
+re-run and will not duplicate. The club and player names are placeholders meant
+to be corrected in the admin.
 
 | Service | URL | Credentials |
 | --- | --- | --- |
@@ -333,12 +341,25 @@ also how you would prepare a production database:
 docker compose exec -T db mysql -ucms -psecret cms_template_engine < docker/mysql/init/02-modernize-schema.sql
 ```
 
-Rebuild from scratch, destroying all local data. The `migrate` is required — a
-new volume is seeded from the dump alone, which has no `event*` tables:
+Rebuild from scratch. **`down -v` destroys the volume, and with it every event,
+club, squad, tie and schedule row** — none of that is in the dump, so the only
+way back is the seeder, with whatever the admin had edited since lost. Export
+first if the content matters:
+
+```bash
+docker compose exec db mysqldump -uroot -proot cms_template_engine \
+  --tables $(docker compose exec -T db mysql -uroot -proot -sN -e \
+  "SELECT GROUP_CONCAT(table_name SEPARATOR ' ') FROM information_schema.tables \
+   WHERE table_schema='cms_template_engine' AND table_name LIKE 'terre217\_event%';") \
+  > event-content.sql
+```
+
+Then:
 
 ```bash
 docker compose down -v && docker compose up -d
 docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
 ```
 
 ### Strict mode
