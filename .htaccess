@@ -1,8 +1,38 @@
+# The document root is the project root, so anything that exists on disk is a
+# candidate for being served as a plain file. The rewrite below only forwards a
+# request to Laravel when the path does NOT exist (!-f / !-d) — which means
+# every real file outside resources/assets/ is downloadable unless it is denied
+# here. On the cPanel host this file is the only protection there is;
+# docker/apache/vhost.conf carries the equivalent rules for the container and
+# never ships to the host.
+#
+# This is not belt-and-braces. Without the deny rules below,
+# cms-template-engine.sql (the whole database, admin password hashes included)
+# and storage/logs/laravel.log (stack traces, which carry credentials) are a
+# plain GET away.
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Application internals. Matched before the rewrite so an existing file
+    # cannot be served, and 403 rather than 404 so the rule is visibly working.
+    RewriteRule ^(app|bootstrap|config|database|docker|scripts|tests|vendor|update|adminemail|email)(/|$) - [F,L]
+    RewriteRule ^resources/(views|lang)(/|$) - [F,L]
+    RewriteRule ^storage(/|$) - [F,L]
+
+    # Files that are never meant to be fetched, wherever they sit.
+    RewriteRule \.(sql|log|md|sh|yml|yaml|lock|json|bak|ini|dist|example)$ - [F,L]
+    RewriteRule (^|/)\. - [F,L]
+    RewriteRule ^(artisan|Dockerfile|server\.php)$ - [F,L]
 
     # Redirect all requests to index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Belt to the rewrite's braces: if mod_rewrite is ever unavailable, dotfiles
+# still must not be served.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
