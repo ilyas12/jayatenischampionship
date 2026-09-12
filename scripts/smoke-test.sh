@@ -47,67 +47,40 @@ expect_auth() { # url expected-code label
     if [ "$got" = "$2" ]; then ok "$3 ($got)"; else bad "$3 — expected $2, got $got"; fi
 }
 
-head_ "Teams from the CMS"
-# The homepage carries a clubs strip that links into the teams page.
-if curl -s --max-time 30 "$BASE/" | grep -qE 'club-tile|No clubs have entered'; then
-    ok "homepage clubs strip renders or explains itself"
-else
-    bad "homepage clubs strip missing"
-fi
+head_ "Jaya Tennis Championship (2026 theme)"
+for path in "" past-winners schedule draw register; do
+    expect "$BASE/$path" 200 "GET /$path"
+done
 
-if curl -s --max-time 30 "$BASE/teams" | grep -q 'id="teamGrid"'; then
-    ok "teams grid renders"
-else
-    bad "teams grid missing"
-fi
-if curl -s --max-time 30 "$BASE/teams" | grep -qE 'teamCount">[0-9]+'; then
-    ok "team count is rendered from the data"
-else
-    bad "team count not rendered"
-fi
+# One structural marker per page, so a template that renders but renders empty
+# is caught rather than passing on its status code.
+check_contains() { # url pattern label
+    if curl -s --max-time 30 "$1" | grep -qE "$2"; then ok "$3"; else bad "$3"; fi
+}
 
-# Cards link to a detail page keyed on the team's permalink.
-TEAM_URL="$(curl -s --max-time 30 "$BASE/teams" \
-    | grep -oE 'href="[^"]*/teams/[a-z0-9-]+"' | head -1 | sed 's/href="//;s/"$//')"
-if [ -n "$TEAM_URL" ]; then
-    case "$TEAM_URL" in http*) ;; *) TEAM_URL="$BASE$TEAM_URL" ;; esac
-    expect "$TEAM_URL" 200 "team detail page"
-else
-    bad "no team detail link on the teams page"
-fi
-expect "$BASE/teams/no-such-team" 404 "unknown team returns 404"
+check_contains "$BASE/"             'jtc__hero'          "home renders its hero"
+check_contains "$BASE/"             'jtc__quick-item'    "home renders the quick links band"
+check_contains "$BASE/"             'jtc__partners-row'  "home renders the partners row"
+check_contains "$BASE/past-winners" 'jtc__winner-grid'   "past winners renders the champion grid"
+check_contains "$BASE/past-winners" 'data-jtc-tabs="year"' "past winners renders its year tabs"
+check_contains "$BASE/schedule"     'jtc__table'         "schedule renders its table"
+check_contains "$BASE/schedule"     'data-jtc-row="match"' "schedule rows carry their filter keys"
+check_contains "$BASE/draw"         'jtc__bracket'       "draw renders the bracket"
+check_contains "$BASE/draw"         'jtc__slot--champion' "draw renders the champion slot"
+check_contains "$BASE/register"     'jtc__form-panel'    "register renders the entry form"
+check_contains "$BASE/register"     'jtc__category-grid' "register renders the category choices"
 
-# Draw and results read event_matches, but what they show depends on the event
-# phase — in registration there is deliberately no bracket. The page must still
-# be reachable and must explain itself rather than render blank.
-head_ "Draw and results"
-DRAW_BODY="$(curl -s --max-time 30 "$BASE/draw")"
-expect "$BASE/draw" 200 "draw page is reachable in every phase"
-
-if printf '%s' "$DRAW_BODY" | grep -q 'class="round__title"'; then
-    ok "bracket rounds render"
-    if printf '%s' "$DRAW_BODY" | grep -q 'data-draw-panel'; then
-        ok "draw renders a bracket panel per category"
-    else
-        bad "draw category panels missing"
-    fi
-elif printf '%s' "$DRAW_BODY" | grep -q 'phase-notice'; then
-    ok "no draw yet — the page explains the phase instead of rendering blank"
-else
-    bad "draw page has neither a bracket nor a phase notice"
-fi
-
-if printf '%s' "$DRAW_BODY" | grep -qE 'board__winner|phase-notice'; then
-    ok "results board shows played ties or says why it is empty"
-else
-    bad "results board is blank with no explanation"
-fi
+for asset in css/jtc_style.css js/jtc_main.js img/jtc_logo_dark.png img/jtc_hero_home.jpg img/jtc_headline_lockup.png; do
+    expect "$BASE/resources/assets/jtc/$asset" 200 "GET theme asset $asset"
+done
 
 # Event registration flow, end to end: submit -> payment page -> proof upload.
-# Needs the grandstand-open-2026 event seeded; skips cleanly if it is not.
+# The public entry form is not open in the 2026 theme, but the endpoint behind
+# it still is: the admin verifies through it and the confirmation page is the
+# one public page that writes to the database.
 head_ "Event registration flow"
 REG_COOKIES="$(mktemp)"
-REG_TOKEN="$(curl -s -c "$REG_COOKIES" --max-time 30 "$BASE/registration" \
+REG_TOKEN="$(curl -s -c "$REG_COOKIES" --max-time 30 "$BASE/register" \
     | grep -oE 'name="_token" value="[^"]*"' | head -1 | sed 's/.*value="//;s/"//')"
 REG_LOC="$(curl -s -b "$REG_COOKIES" -c "$REG_COOKIES" -o /dev/null -w '%{redirect_url}' --max-time 30 \
     -X POST "$BASE/event/grandstand-open-2026/register" \
@@ -125,6 +98,12 @@ case "$REG_LOC" in
             ok "payment page shows the reference code"
         else
             bad "payment page does not show the reference code"
+        fi
+        # It wears the 2026 chrome now; the old theme it extended is archived.
+        if curl -s -b "$REG_COOKIES" --max-time 30 "$BASE/event/payment/$REG_CODE" | grep -q 'jtc__panel'; then
+            ok "payment page renders in the current theme"
+        else
+            bad "payment page is not using the current theme"
         fi
         ;;
     *)
@@ -144,22 +123,6 @@ if [ -n "${REG_CODE:-}" ] && docker compose ps db >/dev/null 2>&1; then
     else
         bad "could not delete registration $REG_CODE — it will linger in the admin list"
     fi
-fi
-
-# Grandstand Open — static slice of the tennis mockup.
-head_ "Tennis site (site root)"
-for path in "" teams draw schedule registration; do
-    expect "$BASE/$path" 200 "GET /$path"
-done
-for asset in css/style.css js/main.js img/teams/src.svg img/players/player-serve.jpg img/players/player-forehand.jpg; do
-    expect "$BASE/resources/assets/tennis/$asset" 200 "GET tennis asset $asset"
-done
-# The rules modal lives after </main> in the source and was missed by the first
-# extraction; assert it is actually on the page.
-if curl -s --max-time 30 "$BASE/registration" | grep -q 'id="rulesModal"'; then
-    ok "registration page includes the rules modal"
-else
-    bad "registration page is missing the rules modal"
 fi
 
 head_ "Error handling"
@@ -244,7 +207,8 @@ else
 fi
 
 head_ "Application internals must not be reachable over HTTP"
-for path in .env vendor/autoload.php app/User.php composer.json cms-template-engine.sql resources/views; do
+for path in .env vendor/autoload.php app/User.php composer.json cms-template-engine.sql resources/views \
+             old old/controllers/Tennis.php old/views/tennis/layout.blade.php; do
     expect "$BASE/$path" 403 "GET /$path is denied"
 done
 

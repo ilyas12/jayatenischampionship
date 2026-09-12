@@ -16,7 +16,7 @@
 
     # Application internals. Matched before the rewrite so an existing file
     # cannot be served, and 403 rather than 404 so the rule is visibly working.
-    RewriteRule ^(app|bootstrap|config|database|docker|scripts|tests|vendor|update|adminemail|email)(/|$) - [F,L]
+    RewriteRule ^(app|bootstrap|config|database|docker|old|scripts|tests|vendor|update|adminemail|email)(/|$) - [F,L]
     RewriteRule ^resources/(views|lang)(/|$) - [F,L]
     RewriteRule ^storage(/|$) - [F,L]
 

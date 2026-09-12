@@ -1203,6 +1203,58 @@
 }
 
 /* --------------------------------------------------------------------------
+   Panels and alerts — the payment confirmation page, the one public page
+   outside the slice that still reads and writes real data.
+   -------------------------------------------------------------------------- */
+
+.jtc__panel {
+  padding: 26px 28px;
+  margin-bottom: 22px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+}
+
+.jtc__panel-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.jtc__panel-code {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--forest);
+  margin-bottom: 16px;
+}
+
+.jtc__panel-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 8px;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+}
+.jtc__panel-row strong { color: var(--forest); }
+
+.jtc__alert {
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  border-left: 3px solid var(--forest);
+  background: var(--paper);
+  color: var(--forest);
+}
+
+.jtc__alert--ok    { border-left-color: var(--success); color: var(--success); }
+.jtc__alert--error { border-left-color: #A6402F; color: #A6402F; }
+
+.jtc__section input[type="file"] { padding: 11px 14px; cursor: pointer; }
+
+/* --------------------------------------------------------------------------
    Responsive
    -------------------------------------------------------------------------- */
 

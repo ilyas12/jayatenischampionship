@@ -31,7 +31,7 @@ class EventTeamMemberModel extends Model
     {
         $file = self::PLACEHOLDERS[abs((int) $id) % count(self::PLACEHOLDERS)];
 
-        return url('resources/assets/tennis/img/players/' . $file);
+        return url('resources/assets/jtc/img/players/' . $file);
     }
 
     public function getPlaceholderPhotoUrlAttribute()

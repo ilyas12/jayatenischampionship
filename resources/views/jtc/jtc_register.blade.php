@@ -67,6 +67,7 @@
          an action and the disabled attributes removed, nothing more. --}}
     <aside class="jtc__form-panel">
       <form id="jtc-register-form" method="post" action="#" novalidate>
+        @csrf
         <h2 class="jtc__form-title">Player information</h2>
 
         <div class="jtc__field">

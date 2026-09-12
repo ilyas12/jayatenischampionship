@@ -130,11 +130,11 @@ class EventTeamModel extends Model
 
         $code = strtolower((string) $this->short_code);
 
-        if ($code === '' || ! file_exists(base_path('resources/assets/tennis/img/teams/' . $code . '.svg'))) {
+        if ($code === '' || ! file_exists(base_path('resources/assets/jtc/img/teams/' . $code . '.svg'))) {
             return null;
         }
 
-        return url('resources/assets/tennis/img/teams/' . $code . '.svg');
+        return url('resources/assets/jtc/img/teams/' . $code . '.svg');
     }
 
     /** Stand-in when a club has neither an upload nor crest artwork. */

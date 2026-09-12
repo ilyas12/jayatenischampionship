@@ -133,35 +133,23 @@ $router->group([
 /**
  * FRONTEND ROUTES
  *
- * Jaya Tennis Championship, at the site root. The Dua Sisi money changer and
- * Swarnadwipa themes that used to live here have been removed; the CMS beneath
- * them — the admin panel and the event modules — is untouched.
+ * Jaya Tennis Championship, 2026 theme — sliced from JTC_Desktop_Master_New.psd
+ * and serving the site root. The theme it replaced is parked under old/, which
+ * is where to look for the queries that wired these pages to the CMS.
  **/
 $router->group([
     'namespace' => 'Http\Controllers'
 ], function ($router) {
-    Route::get('/', array('as' => 'tennis_home', 'uses' => 'Tennis@home'));
-    Route::get('/schedule', array('as' => 'tennis_schedule', 'uses' => 'Tennis@schedule'));
-    Route::get('/teams', array('as' => 'tennis_teams', 'uses' => 'Tennis@teams'));
-    Route::get('/teams/{permalink}', array('as' => 'tennis_team', 'uses' => 'Tennis@team'));
-    Route::get('/draw', array('as' => 'tennis_bracket', 'uses' => 'Tennis@bracket'));
-    Route::get('/registration', array('as' => 'tennis_registration', 'uses' => 'Tennis@registration'));
-
-    /**
-     * Jaya Tennis Championship 2026 theme, sliced from JTC_Desktop_Master_New.psd.
-     *
-     * Under /jtc while it runs alongside the current site — the two share four
-     * of their five paths, so they cannot both sit at the root. Moving this to
-     * the root is a matter of dropping the prefix once it replaces the old one.
-     */
-    Route::get('/jtc', array('as' => 'jtc_home', 'uses' => 'Jtc@home'));
-    Route::get('/jtc/past-winners', array('as' => 'jtc_past_winners', 'uses' => 'Jtc@pastWinners'));
-    Route::get('/jtc/schedule', array('as' => 'jtc_schedule', 'uses' => 'Jtc@schedule'));
-    Route::get('/jtc/draw', array('as' => 'jtc_draw', 'uses' => 'Jtc@draw'));
-    Route::get('/jtc/register', array('as' => 'jtc_register', 'uses' => 'Jtc@register'));
+    Route::get('/', array('as' => 'jtc_home', 'uses' => 'Jtc@home'));
+    Route::get('/past-winners', array('as' => 'jtc_past_winners', 'uses' => 'Jtc@pastWinners'));
+    Route::get('/schedule', array('as' => 'jtc_schedule', 'uses' => 'Jtc@schedule'));
+    Route::get('/draw', array('as' => 'jtc_draw', 'uses' => 'Jtc@draw'));
+    Route::get('/register', array('as' => 'jtc_register', 'uses' => 'Jtc@register'));
 
     /**
      * Event registration — generic, keyed by event slug and registration code.
+     * Still live: the admin verifies entries through it, and the confirmation
+     * page is the only public page that writes to the database.
      */
     Route::post('/event/{slug}/register', array('as' => 'event_register', 'uses' => 'EventRegistration@store'));
     Route::get('/event/payment/{code}', array('as' => 'event_payment', 'uses' => 'EventRegistration@confirm'));
