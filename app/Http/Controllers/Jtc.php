@@ -356,7 +356,13 @@ class Jtc extends \Illuminate\Routing\Controller
             ];
         }
 
-        if ($event && $event->closes_at && $event->closes_at->isPast()) {
+        // Closed once the date has passed — or once the event has moved on
+        // from taking entries, whatever the date says. Without the phase test
+        // a finished tournament whose closing date is still in the future
+        // invites people to enter it.
+        $movedOn = $event && $event->phase !== EventModel::REGISTRATION;
+
+        if ($event && ($movedOn || ($event->closes_at && $event->closes_at->isPast()))) {
             return ['icon' => 'trophy', 'label' => 'Registration', 'value' => 'Closed', 'note' => 'Entries are in'];
         }
 
