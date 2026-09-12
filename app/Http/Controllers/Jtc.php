@@ -5,6 +5,7 @@ namespace terre\Http\Controllers;
 use terre\Http\Models\EventCategoryModel;
 use terre\Http\Models\EventMatchModel;
 use terre\Http\Models\EventModel;
+use terre\Http\Models\EventPartnerModel;
 use terre\Http\Models\EventScheduleModel;
 use terre\Http\Models\EventTeamMemberModel;
 use terre\Http\Models\EventTeamModel;
@@ -62,15 +63,8 @@ class Jtc extends \Illuminate\Routing\Controller
                 ['icon' => 'people', 'title' => 'Networking',  'text' => 'Meet new people'],
                 ['icon' => 'chart',  'title' => 'Community',   'text' => 'A stronger tennis ecosystem'],
             ],
-            'partners' => [
-                ['name' => 'Jaya',        'file' => 'jtc_partner_jaya.png'],
-                ['name' => 'BCA',         'file' => 'jtc_partner_bca.png'],
-                ['name' => 'HEAD',        'file' => 'jtc_partner_head.png'],
-                ['name' => 'Wilson',      'file' => 'jtc_partner_wilson.png'],
-                ['name' => 'Pocari Sweat','file' => 'jtc_partner_pocari.png'],
-                ['name' => 'Le Minerale', 'file' => 'jtc_partner_le_minerale.png'],
-                ['name' => 'ASICS',       'file' => 'jtc_partner_asics.png'],
-            ],
+            // The strip hides itself when this edition has no partners.
+            'partners' => EventPartnerModel::forEvent($event),
         ]);
     }
 

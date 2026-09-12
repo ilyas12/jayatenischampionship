@@ -116,6 +116,7 @@ $router->group([
         Route::any('/event_team_members', array('as' => 'admin_event_team_members', 'uses' => 'EventTeamMembers@index'));
         Route::any('/event_teams', array('as' => 'admin_event_teams', 'uses' => 'EventTeams@index'));
         Route::any('/event_registrations', array('as' => 'admin_event_registrations', 'uses' => 'EventRegistrations@index'));
+        Route::any('/event_partners', array('as' => 'admin_event_partners', 'uses' => 'EventPartners@index'));
 
         Route::any('/newsletter', array('as' => 'admin_newsletter', 'uses' => 'Newsletter@index'));
         Route::any('/social_link', array('as' => 'admin_social_link', 'uses' => 'SocialLink@index'));

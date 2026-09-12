@@ -118,15 +118,23 @@
     </section>
   @endif
 
-  {{-- Partners --}}
-  <section class="jtc__container jtc__partners">
-    <p class="jtc__partners-heading">Our partners</p>
-    <div class="jtc__partners-row">
-      @foreach ($partners as $partner)
-        <img src="{{ \terre\Libraries\Asset::v('resources/assets/jtc/img/partners/' . $partner['file']) }}"
-             alt="{{ $partner['name'] }}" loading="lazy">
-      @endforeach
-    </div>
-  </section>
+  {{-- Partners for this edition. A logo links out when one has been given a
+       URL, and is just artwork when it has not. --}}
+  @if (count($partners))
+    <section class="jtc__container jtc__partners">
+      <p class="jtc__partners-heading">Our partners</p>
+      <div class="jtc__partners-row">
+        @foreach ($partners as $partner)
+          @if ($partner->url)
+            <a href="{{ $partner->url }}" target="_blank" rel="noopener">
+              <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}" loading="lazy">
+            </a>
+          @else
+            <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}" loading="lazy">
+          @endif
+        @endforeach
+      </div>
+    </section>
+  @endif
 
 @endsection

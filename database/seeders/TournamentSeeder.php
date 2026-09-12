@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use terre\Http\Models\EventCategoryModel;
 use terre\Http\Models\EventMatchModel;
 use terre\Http\Models\EventModel;
+use terre\Http\Models\EventPartnerModel;
 use terre\Http\Models\EventScheduleModel;
 use terre\Http\Models\EventTeamMemberModel;
 use terre\Http\Models\EventTeamModel;
@@ -64,6 +65,7 @@ class TournamentSeeder extends Seeder
         EventMatchModel::where('event_id', $event->id)->delete();
         EventScheduleModel::where('event_id', $event->id)->delete();
         EventCategoryModel::where('event_id', $event->id)->delete();
+        EventPartnerModel::where('event_id', $event->id)->delete();
 
         $teamIds = EventTeamModel::where('event_id', $event->id)->pluck('id');
         EventTeamMemberModel::whereIn('team_id', $teamIds)->delete();
@@ -75,11 +77,13 @@ class TournamentSeeder extends Seeder
         $this->squads($teams);
         $this->draw($event, $categories['ms'], $teams);
         $this->schedule($event);
+        $this->partners($event);
 
         $this->command->info(sprintf(
-            'Seeded %s: %d clubs, %d categories, %d ties.',
+            'Seeded %s: %d clubs, %d categories, %d ties, %d partners.',
             $event->title, count($teams), count($categories),
-            EventMatchModel::where('event_id', $event->id)->count()
+            EventMatchModel::where('event_id', $event->id)->count(),
+            EventPartnerModel::where('event_id', $event->id)->count()
         ));
     }
 
@@ -248,6 +252,50 @@ class TournamentSeeder extends Seeder
             'order_id'       => $order,
             'publish'        => 1,
         ]);
+    }
+
+    /**
+     * The sponsors the design ships with. Their artwork lives in the theme, but
+     * the admin uploads into resources/assets/uploads/event_partners and stores
+     * a bare filename, so it is copied there — otherwise a logo replaced
+     * through the admin and one seeded here would live in different places.
+     */
+    private function partners($event)
+    {
+        $rows = [
+            ['Jaya',         'jtc_partner_jaya.png'],
+            ['BCA',          'jtc_partner_bca.png'],
+            ['HEAD',         'jtc_partner_head.png'],
+            ['Wilson',       'jtc_partner_wilson.png'],
+            ['Pocari Sweat', 'jtc_partner_pocari.png'],
+            ['Le Minerale',  'jtc_partner_le_minerale.png'],
+            ['ASICS',        'jtc_partner_asics.png'],
+        ];
+
+        $source = base_path('resources/assets/jtc/img/partners');
+        $target = base_path('resources/assets/uploads/event_partners');
+
+        if (! is_dir($target)) {
+            mkdir($target, 0775, true);
+        }
+
+        $order = 0;
+
+        foreach ($rows as $row) {
+            list($name, $file) = $row;
+
+            if (is_file($source . '/' . $file) && ! is_file($target . '/' . $file)) {
+                copy($source . '/' . $file, $target . '/' . $file);
+            }
+
+            EventPartnerModel::create([
+                'event_id' => $event->id,
+                'name'     => $name,
+                'logo'     => $file,
+                'order_id' => $order++,
+                'publish'  => 1,
+            ]);
+        }
     }
 
     private function schedule($event)

@@ -60,7 +60,8 @@ check_contains() { # url pattern label
 
 check_contains "$BASE/"             'jtc__hero'          "home renders its hero"
 check_contains "$BASE/"             'jtc__quick-item'    "home renders the quick links band"
-check_contains "$BASE/"             'jtc__partners-row'  "home renders the partners row"
+check_contains "$BASE/" 'jtc__partners-row|jtc__partners-row' "home renders the partners row"
+check_contains "$BASE/" 'uploads/event_partners/' "partner logos come from the CMS, not the theme folder"
 # The facts strip reads the event: its categories are the ones in the CMS, not
 # the three the mockup drew.
 check_contains "$BASE/" 'jtc__fact-list' "home lists the event's categories"
