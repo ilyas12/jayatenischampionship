@@ -61,6 +61,9 @@ check_contains() { # url pattern label
 check_contains "$BASE/"             'jtc__hero'          "home renders its hero"
 check_contains "$BASE/"             'jtc__quick-item'    "home renders the quick links band"
 check_contains "$BASE/"             'jtc__partners-row'  "home renders the partners row"
+# The facts strip reads the event: its categories are the ones in the CMS, not
+# the three the mockup drew.
+check_contains "$BASE/" 'jtc__fact-list' "home lists the event's categories"
 check_contains "$BASE/past-winners" 'jtc__winner-grid|jtc__notice' "past winners renders champions or says there are none"
 # Schedule and draw read event_matches, so what they show depends on the data
 # and on the event phase: no bracket before the draw is made. Either the real

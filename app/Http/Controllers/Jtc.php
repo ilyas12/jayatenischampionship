@@ -5,6 +5,9 @@ namespace terre\Http\Controllers;
 use terre\Http\Models\EventCategoryModel;
 use terre\Http\Models\EventMatchModel;
 use terre\Http\Models\EventModel;
+use terre\Http\Models\EventScheduleModel;
+use terre\Http\Models\EventTeamMemberModel;
+use terre\Http\Models\EventTeamModel;
 
 /**
  * Jaya Tennis Championship — 2026 theme.
@@ -25,9 +28,14 @@ class Jtc extends \Illuminate\Routing\Controller
 {
     public function home()
     {
+        $event = EventModel::current();
+
         return view('jtc.jtc_home', [
             'active'     => 'jtc_home',
-            'facts'      => $this->facts(),
+            'event'      => $event,
+            'year'       => $event ? $this->editionYear($event) : date('Y'),
+            'facts'      => $this->facts($event),
+            'lastEdition'=> $this->lastEdition(),
             'quickLinks' => [
                 [
                     'icon'    => 'calendar',
@@ -52,12 +60,6 @@ class Jtc extends \Illuminate\Routing\Controller
                 ['icon' => 'people', 'title' => 'Competition', 'text' => 'Play at your best'],
                 ['icon' => 'people', 'title' => 'Networking',  'text' => 'Meet new people'],
                 ['icon' => 'chart',  'title' => 'Community',   'text' => 'A stronger tennis ecosystem'],
-            ],
-            'stats' => [
-                ['value' => '200+', 'label' => 'Players'],
-                ['value' => '50+',  'label' => 'Companies'],
-                ['value' => '300+', 'label' => 'Matches'],
-                ['value' => '1',    'label' => "Stronger\nCommunity"],
             ],
             'partners' => [
                 ['name' => 'Jaya',        'file' => 'jtc_partner_jaya.png'],
@@ -144,9 +146,15 @@ class Jtc extends \Illuminate\Routing\Controller
      * and the events table stores no year of its own. The ties carry the real
      * dates; the registration window is the fallback when none of them do.
      */
-    private function editionYear($event, $ties)
+    private function editionYear($event, $ties = null)
     {
-        $played = $ties->pluck('starts_at')->filter()->max();
+        $played = $ties
+            ? $ties->pluck('starts_at')->filter()->max()
+            : EventMatchModel::where('event_id', $event->id)->max('starts_at');
+
+        if (is_string($played)) {
+            $played = \Carbon\Carbon::parse($played);
+        }
 
         if ($played) {
             return (int) $played->format('Y');
@@ -281,7 +289,7 @@ class Jtc extends \Illuminate\Routing\Controller
 
     public function register()
     {
-        $facts = $this->facts();
+        $facts = $this->facts(EventModel::current());
         $facts[3]['label'] = 'Registration period';
 
         return view('jtc.jtc_register', [
@@ -302,17 +310,118 @@ class Jtc extends \Illuminate\Routing\Controller
     }
 
     /**
-     * The four-column strip shared by the home and register pages. Register
-     * relabels the last column, which is the only difference between them.
+     * The four-column strip shared by the home and register pages.
+     *
+     * Dates, categories and the entry status come from the event. The venue
+     * does not: events have no venue column, so it stays the design's copy
+     * until there is somewhere to put it.
      */
-    private function facts()
+    private function facts($event)
     {
+        $dates      = $this->editionDates($event);
+        $categories = EventCategoryModel::forEvent($event)->pluck('name')->all();
+
         return [
-            ['icon' => 'calendar', 'label' => 'Tournament date', 'value' => 'TBA', 'note' => '2026'],
-            ['icon' => 'pin',      'label' => 'Venue',           'value' => 'Jakarta', 'note' => 'Indonesia'],
-            ['icon' => 'people',   'label' => 'Categories',      'list'  => ["Men's Doubles", "Women's Doubles", 'Mixed Doubles']],
-            ['icon' => 'trophy',   'label' => 'Open for registration', 'value' => 'Coming soon', 'note' => 'Stay tuned'],
+            [
+                'icon'  => 'calendar',
+                'label' => 'Tournament date',
+                'value' => $dates ? $this->dateRange($dates) : 'TBA',
+                'note'  => $event ? $this->editionYear($event) : date('Y'),
+            ],
+            ['icon' => 'pin', 'label' => 'Venue', 'value' => 'Jakarta', 'note' => 'Indonesia'],
+            [
+                'icon'  => 'people',
+                'label' => 'Categories',
+                'list'  => $categories ?: ['To be announced'],
+            ],
+            $this->entryFact($event),
         ];
+    }
+
+    /** The last column: whether entries are open, and until when. */
+    private function entryFact($event)
+    {
+        if ($event && $event->acceptsEntries()) {
+            return [
+                'icon'  => 'trophy',
+                'label' => 'Open for registration',
+                'value' => 'Open now',
+                'note'  => $event->closes_at ? 'Until ' . $event->closes_at->format('j M') : 'Enter today',
+            ];
+        }
+
+        if ($event && $event->closes_at && $event->closes_at->isPast()) {
+            return ['icon' => 'trophy', 'label' => 'Registration', 'value' => 'Closed', 'note' => 'Entries are in'];
+        }
+
+        return ['icon' => 'trophy', 'label' => 'Open for registration', 'value' => 'Coming soon', 'note' => 'Stay tuned'];
+    }
+
+    /**
+     * The most recent edition whose results are public, counted up for the
+     * "in numbers" band. Null when no edition has been played — the band is a
+     * boast about a past tournament and there is nothing to boast about yet.
+     */
+    private function lastEdition()
+    {
+        $event = EventModel::where('publish', 1)->get()
+            ->filter(function ($e) { return $e->showsResults(); })
+            ->sortByDesc(function ($e) { return $this->editionYear($e); })
+            ->first();
+
+        if (! $event) {
+            return null;
+        }
+
+        $teamIds = EventTeamModel::where('event_id', $event->id)->where('publish', 1)->pluck('id');
+
+        return [
+            'year'  => $this->editionYear($event),
+            'stats' => [
+                [
+                    'value' => (string) EventTeamMemberModel::whereIn('team_id', $teamIds)->where('publish', 1)->count(),
+                    'label' => 'Players',
+                ],
+                ['value' => (string) $teamIds->count(), 'label' => 'Clubs'],
+                [
+                    'value' => (string) EventMatchModel::where('event_id', $event->id)->where('publish', 1)->count(),
+                    'label' => 'Matches',
+                ],
+                ['value' => '1', 'label' => "Stronger\nCommunity"],
+            ],
+        ];
+    }
+
+    /** First and last day an edition is played, or null if nothing is dated. */
+    private function editionDates($event)
+    {
+        if (! $event) {
+            return null;
+        }
+
+        $days = EventMatchModel::where('event_id', $event->id)->where('publish', 1)
+            ->whereNotNull('starts_at')->get()->pluck('starts_at');
+
+        if ($days->isEmpty()) {
+            $days = EventScheduleModel::where('event_id', $event->id)->where('publish', 1)
+                ->whereNotNull('starts_on')->get()->pluck('starts_on');
+        }
+
+        return $days->isEmpty() ? null : [$days->min(), $days->max()];
+    }
+
+    /** "12 — 19 Oct", or a single day when that is all there is. */
+    private function dateRange($dates)
+    {
+        list($from, $to) = $dates;
+
+        if ($from->isSameDay($to)) {
+            return $from->format('j M');
+        }
+
+        return $from->format('M') === $to->format('M')
+            ? $from->format('j') . '–' . $to->format('j M')
+            : $from->format('j M') . ' – ' . $to->format('j M');
     }
 
 }

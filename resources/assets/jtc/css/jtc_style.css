@@ -440,6 +440,7 @@
 .jtc__quick-body { flex: 1 1 auto; }
 
 .jtc__quick-title {
+  display: block;
   font-size: 21px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -447,6 +448,7 @@
 }
 
 .jtc__quick-caption {
+  display: block;
   margin-top: 6px;
   font-size: 13px;
   font-weight: 600;
@@ -506,6 +508,7 @@
 .jtc__pillar-icon { color: var(--forest); flex: none; }
 
 .jtc__pillar-title {
+  display: block;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -514,6 +517,8 @@
 }
 
 .jtc__pillar-text {
+  display: block;
+  margin-top: 3px;
   font-size: 14px;
   line-height: 1.5;
   color: var(--muted);
@@ -1114,9 +1119,10 @@
 }
 .jtc__info:first-child { border-left: 0; padding-left: 0; }
 
-.jtc__info-label { font-size: 14px; color: var(--muted); }
+.jtc__info-label { display: block; font-size: 14px; color: var(--muted); }
 
 .jtc__info-value {
+  display: block;
   margin-top: 2px;
   font-size: 14px;
   font-weight: 600;

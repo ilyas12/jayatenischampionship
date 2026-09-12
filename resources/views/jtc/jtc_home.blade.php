@@ -11,7 +11,7 @@
   <section class="jtc__hero"
            style="background-image: url('{{ \terre\Libraries\Asset::v('resources/assets/jtc/img/jtc_hero_home.jpg') }}')">
     <div class="jtc__container jtc__hero-inner">
-      <p class="jtc__hero-meta">Jakarta<br>2026</p>
+      <p class="jtc__hero-meta">Jakarta<br>{{ $year }}</p>
 
       <img class="jtc__hero-lockup"
            src="{{ \terre\Libraries\Asset::v('resources/assets/jtc/img/jtc_headline_lockup.png') }}"
@@ -95,25 +95,28 @@
     </div>
   </section>
 
-  {{-- Last edition in numbers --}}
-  <section class="jtc__numbers"
-           style="background-image: url('{{ \terre\Libraries\Asset::v('resources/assets/jtc/img/jtc_numbers_bg.jpg') }}')">
-    <div class="jtc__container jtc__numbers-inner">
-      <div class="jtc__numbers-title">
-        <p class="jtc__eyebrow jtc__eyebrow--light">Last edition</p>
-        <h2 class="jtc__serif">JTC 2025<br>in numbers</h2>
-      </div>
+  {{-- Last edition in numbers. A boast about a tournament that has been
+       played, so it is absent rather than zeroed until one has been. --}}
+  @if ($lastEdition)
+    <section class="jtc__numbers"
+             style="background-image: url('{{ \terre\Libraries\Asset::v('resources/assets/jtc/img/jtc_numbers_bg.jpg') }}')">
+      <div class="jtc__container jtc__numbers-inner">
+        <div class="jtc__numbers-title">
+          <p class="jtc__eyebrow jtc__eyebrow--light">Last edition</p>
+          <h2 class="jtc__serif">JTC {{ $lastEdition['year'] }}<br>in numbers</h2>
+        </div>
 
-      <div class="jtc__stats">
-        @foreach ($stats as $stat)
-          <div class="jtc__stat">
-            <p class="jtc__stat-value">{{ $stat['value'] }}</p>
-            <p class="jtc__stat-label">{!! nl2br(e($stat['label'])) !!}</p>
-          </div>
-        @endforeach
+        <div class="jtc__stats">
+          @foreach ($lastEdition['stats'] as $stat)
+            <div class="jtc__stat">
+              <p class="jtc__stat-value">{{ $stat['value'] }}</p>
+              <p class="jtc__stat-label">{!! nl2br(e($stat['label'])) !!}</p>
+            </div>
+          @endforeach
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  @endif
 
   {{-- Partners --}}
   <section class="jtc__container jtc__partners">
