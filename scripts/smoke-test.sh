@@ -97,6 +97,15 @@ fi
 check_contains "$BASE/register"     'jtc__form-panel'    "register renders the entry form"
 check_contains "$BASE/register"     'jtc__category-grid' "register renders the category choices"
 
+# Editorial pages, by slug, through the catch-all route registered last.
+for path in privacy-policy terms-conditions contact; do
+    expect "$BASE/$path" 200 "GET /$path"
+done
+check_contains "$BASE/privacy-policy" 'jtc__prose' "an editorial page renders its content"
+check_contains "$BASE/" 'href="[^"]*privacy-policy"' "footer links to the pages the CMS flags for it"
+# The catch-all must not swallow a slug nobody published.
+expect "$BASE/not-a-real-page-$$" 404 "an unknown slug is still a 404"
+
 for asset in css/jtc_style.css js/jtc_main.js img/jtc_logo_dark.png img/jtc_hero_home.jpg img/jtc_headline_lockup.png; do
     expect "$BASE/resources/assets/jtc/$asset" 200 "GET theme asset $asset"
 done

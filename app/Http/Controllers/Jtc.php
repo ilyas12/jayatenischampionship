@@ -9,6 +9,7 @@ use terre\Http\Models\EventPartnerModel;
 use terre\Http\Models\EventScheduleModel;
 use terre\Http\Models\EventTeamMemberModel;
 use terre\Http\Models\EventTeamModel;
+use terre\Http\Models\StaticPageModel;
 
 /**
  * Jaya Tennis Championship — 2026 theme.
@@ -66,6 +67,23 @@ class Jtc extends \Illuminate\Routing\Controller
             // The strip hides itself when this edition has no partners.
             'partners' => EventPartnerModel::forEvent($event),
         ]);
+    }
+
+    /**
+     * An editorial page — privacy, terms, contact — written in the admin.
+     *
+     * Registered as the last route in the file, so it only sees a slug none of
+     * the named pages claimed. An unknown one is a 404 like any other.
+     */
+    public function page($permalink)
+    {
+        $page = StaticPageModel::findBySlug($permalink);
+
+        if (! $page) {
+            abort(404);
+        }
+
+        return view('jtc.jtc_page', ['active' => '', 'page' => $page]);
     }
 
     /**

@@ -35,6 +35,8 @@
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+
+  margin: 0px !important;
 }
 
 .jtc *,
@@ -1206,6 +1208,81 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--forest);
+}
+
+/* --------------------------------------------------------------------------
+   Editorial pages
+   -------------------------------------------------------------------------- */
+
+/* The reset above strips margins and list bullets from the whole theme, which
+   is right for a designed layout and wrong for a page written in the admin's
+   editor. This puts them back, inside this block only. */
+.jtc__prose {
+  max-width: 760px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+.jtc__prose h2,
+.jtc__prose h3,
+.jtc__prose h4 {
+  margin-block: 34px 12px;
+  color: var(--forest);
+  line-height: 1.25;
+}
+
+.jtc__prose h2 { font-size: 24px; font-weight: 700; }
+.jtc__prose h3 { font-size: 19px; font-weight: 700; }
+.jtc__prose h4 { font-size: 16px; font-weight: 700; }
+
+.jtc__prose > *:first-child { margin-top: 0; }
+
+.jtc__prose p { margin-block: 0 16px; }
+
+.jtc__prose ul,
+.jtc__prose ol {
+  margin-block: 0 18px;
+  padding-left: 22px;
+  list-style: disc;
+}
+.jtc__prose ol { list-style: decimal; }
+.jtc__prose li { margin-bottom: 7px; }
+
+.jtc__prose a {
+  color: var(--forest);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.jtc__prose a:hover { opacity: .7; }
+
+.jtc__prose strong { color: var(--forest); }
+
+.jtc__prose hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin-block: 32px;
+}
+
+.jtc__prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 18px;
+}
+.jtc__prose th,
+.jtc__prose td {
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  text-align: left;
+}
+
+.jtc__prose img { margin-block: 18px; }
+
+.jtc__prose blockquote {
+  margin: 0 0 18px;
+  padding-left: 20px;
+  border-left: 3px solid var(--rule);
+  color: var(--muted);
 }
 
 /* --------------------------------------------------------------------------

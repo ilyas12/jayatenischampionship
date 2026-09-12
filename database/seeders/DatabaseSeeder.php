@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         // from cms-template-engine.sql, which the db container imports.
         $this->call(TournamentSeeder::class);
         $this->call(SocialLinksSeeder::class);
+        $this->call(PagesSeeder::class);
     }
 }

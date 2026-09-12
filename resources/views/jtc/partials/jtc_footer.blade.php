@@ -3,6 +3,7 @@
     // Shared by every page, so it is fetched here rather than threaded through
     // five controller methods that otherwise have nothing to do with it.
     $socials = \terre\Http\Models\SocialLinkModel::published();
+    $legal   = \terre\Http\Models\StaticPageModel::forFooter();
 @endphp
 
 <footer class="jtc__footer">
@@ -43,11 +44,13 @@
 
     <div class="jtc__footer-bottom">
       <p>&copy; {{ date('Y') }} Jaya Tennis Championship. All rights reserved.</p>
-      <p class="jtc__legal">
-        <a href="#">Privacy Policy</a><span>|</span>
-        <a href="#">Terms &amp; Conditions</a><span>|</span>
-        <a href="#">Contact</a>
-      </p>
+      @if (count($legal))
+        <p class="jtc__legal">
+          @foreach ($legal as $page)
+            <a href="{{ $page->url }}">{{ $page->name }}</a>@if (! $loop->last)<span>|</span>@endif
+          @endforeach
+        </p>
+      @endif
     </div>
 
   </div>

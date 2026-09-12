@@ -155,4 +155,12 @@ $router->group([
     Route::post('/event/{slug}/register', array('as' => 'event_register', 'uses' => 'EventRegistration@store'));
     Route::get('/event/payment/{code}', array('as' => 'event_payment', 'uses' => 'EventRegistration@confirm'));
     Route::post('/event/payment/{code}', array('as' => 'event_payment_upload', 'uses' => 'EventRegistration@upload'));
+
+    /**
+     * Editorial pages by slug — privacy, terms, contact. Last on purpose: it
+     * matches a single segment, so every named route above claims its own path
+     * first and this only sees what is left.
+     */
+    Route::get('/{permalink}', array('as' => 'jtc_page', 'uses' => 'Jtc@page'))
+        ->where('permalink', '[a-z0-9][a-z0-9-]*');
 });
