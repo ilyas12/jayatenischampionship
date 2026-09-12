@@ -313,13 +313,46 @@ class Jtc extends \Illuminate\Routing\Controller
                 ['value' => 'wd', 'name' => "Women's Doubles"],
                 ['value' => 'xd', 'name' => 'Mixed Doubles'],
             ],
-            'information' => [
-                ['icon' => 'document', 'label' => 'Entry Fee',           'value' => 'TBA'],
-                ['icon' => 'people',   'label' => 'Tournament Format',   'value' => 'TBA'],
-                ['icon' => 'calendar', 'label' => 'Rules & Regulations', 'value' => 'View Details', 'url' => '#'],
-                ['icon' => 'document', 'label' => 'FAQ',                 'value' => 'View FAQ',     'url' => '#'],
-            ],
+            'information' => $this->tournamentInformation(EventModel::current()),
         ]);
+    }
+
+    /**
+     * The row under the category cards on the register page.
+     *
+     * The fee is the event's own price. The two pages are linked only when
+     * they exist and are published, so a link never lands on a 404 — an admin
+     * who unpublishes the rules gets "TBA" here rather than a broken promise.
+     */
+    private function tournamentInformation($event)
+    {
+        $rules = StaticPageModel::findBySlug('rules-regulations');
+        $faq   = StaticPageModel::findBySlug('faq');
+
+        return [
+            [
+                'icon'  => 'document',
+                'label' => 'Entry Fee',
+                'value' => $event && $event->price
+                    ? 'Rp ' . number_format($event->price, 0, ',', '.')
+                    : 'TBA',
+            ],
+            // No column on events describes the format, so this stays the
+            // design's placeholder until there is somewhere to write one.
+            ['icon' => 'people', 'label' => 'Tournament Format', 'value' => 'TBA'],
+            [
+                'icon'  => 'calendar',
+                'label' => 'Rules & Regulations',
+                'value' => $rules ? 'View Details' : 'TBA',
+                'url'   => $rules ? $rules->url : null,
+            ],
+            [
+                'icon'  => 'document',
+                'label' => 'FAQ',
+                'value' => $faq ? 'View FAQ' : 'TBA',
+                'url'   => $faq ? $faq->url : null,
+            ],
+        ];
     }
 
     /**

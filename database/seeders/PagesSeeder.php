@@ -40,7 +40,7 @@ class PagesSeeder extends Seeder
             $row->meta_description = $page['summary'];
             $row->content          = $page['content'];
             $row->publish          = 1;
-            $row->fgfooter         = 1;
+            $row->fgfooter         = empty($page['footer']) ? 0 : 1;
             $row->fgdisplay        = 0;
             $row->order_id         = $order++;
             $row->save();
@@ -82,6 +82,7 @@ class PagesSeeder extends Seeder
     {
         return [
             'privacy-policy' => [
+                'footer'  => true,
                 'name'    => 'Privacy Policy',
                 'summary' => 'What the Jaya Tennis Championship collects when you enter, and what happens to it.',
                 'content' => '<p><strong>This page is a starting point and has not been reviewed by a lawyer.'
@@ -110,6 +111,7 @@ class PagesSeeder extends Seeder
             ],
 
             'terms-conditions' => [
+                'footer'  => true,
                 'name'    => 'Terms & Conditions',
                 'summary' => 'The terms that apply when you enter the Jaya Tennis Championship.',
                 'content' => '<p><strong>This page is a starting point and has not been reviewed by a lawyer.'
@@ -138,7 +140,72 @@ class PagesSeeder extends Seeder
                     . ' what happens to entry fees.</p>',
             ],
 
+            'rules-regulations' => [
+                'name'    => 'Rules & Regulations',
+                'summary' => 'How matches are played at the Jaya Tennis Championship.',
+                'content' => '<p><strong>A starting point. Confirm every rule below with the'
+                    . ' organising committee before entries open.</strong></p>'
+                    . '<h2>Format</h2>'
+                    . '<p>Matches are played as doubles in the category entered. The draw is a'
+                    . ' knockout: lose once and you are out. The bracket is published on the draw page'
+                    . ' when entries close.</p>'
+                    . '<h2>Scoring</h2>'
+                    . '<ul>'
+                    . '<li>Best of three tie-break sets.</li>'
+                    . '<li>A tie-break is played at six games all.</li>'
+                    . '<li>No-advantage scoring at deuce, with the receiving pair choosing the side.</li>'
+                    . '</ul>'
+                    . '<h2>Turning up</h2>'
+                    . '<p>Be at your court fifteen minutes before the time on the schedule. A pair more'
+                    . ' than fifteen minutes late may be defaulted. Times can move during the day, so'
+                    . ' check the schedule page rather than relying on the time you were first given.</p>'
+                    . '<h2>Substitutes</h2>'
+                    . '<p>The pair that enters is the pair that plays. Tell the organisers before your'
+                    . ' first match if either player has to be replaced.</p>'
+                    . '<h2>Balls, courts and dress</h2>'
+                    . '<p>Balls are provided and changed as the organisers direct. Proper tennis shoes'
+                    . ' are required. Shirts must be worn on court.</p>'
+                    . '<h2>Calls and disputes</h2>'
+                    . '<p>Players call their own lines and are expected to give the benefit of the doubt'
+                    . ' to their opponents. A referee settles anything that cannot be agreed, and that'
+                    . ' decision is final.</p>'
+                    . '<h2>Weather</h2>'
+                    . '<p>Play stops when the courts are unsafe. Suspended matches resume from the score'
+                    . ' reached; the organisers may shorten later rounds to finish on time.</p>',
+            ],
+
+            'faq' => [
+                'name'    => 'FAQ',
+                'summary' => 'Common questions about entering and playing the Jaya Tennis Championship.',
+                'content' => '<h2>How do I enter?</h2>'
+                    . '<p>Fill in the form on the register page with both players\' names, an email'
+                    . ' address and a WhatsApp number, and choose your category. You will be emailed a'
+                    . ' registration code and the payment instructions.</p>'
+                    . '<h2>When is my place confirmed?</h2>'
+                    . '<p>Once an organiser has checked your payment. Until then the entry sits as'
+                    . ' pending, and your club does not appear on the teams page.</p>'
+                    . '<h2>How do I pay?</h2>'
+                    . '<p>Transfer the entry fee and quote your registration code as the reference, then'
+                    . ' upload the receipt on the confirmation page linked in your email. Without the'
+                    . ' code we cannot match the payment to your entry.</p>'
+                    . '<h2>I have lost my confirmation email.</h2>'
+                    . '<p>Get in touch through the contact page with the name and email you entered'
+                    . ' under, and we will resend it.</p>'
+                    . '<h2>When is the draw made?</h2>'
+                    . '<p>After entries close. It appears on the draw page as soon as it is published —'
+                    . ' before that the page says so rather than showing an empty bracket.</p>'
+                    . '<h2>How do I know when I play?</h2>'
+                    . '<p>The schedule page carries the order of play with the court and time for every'
+                    . ' tie, and it is the version to trust if anything changes.</p>'
+                    . '<h2>Can I enter more than one category?</h2>'
+                    . '<p>Yes. Enter each one separately; each entry has its own fee and its own code.</p>'
+                    . '<h2>Can I get a refund?</h2>'
+                    . '<p>Ask on the contact page. What happens if the tournament cannot go ahead is set'
+                    . ' out in the terms.</p>',
+            ],
+
             'contact' => [
+                'footer'  => true,
                 'name'    => 'Contact',
                 'summary' => 'How to reach the organisers of the Jaya Tennis Championship.',
                 'content' => '<p><strong>Replace the details below with the real ones before the site goes'
