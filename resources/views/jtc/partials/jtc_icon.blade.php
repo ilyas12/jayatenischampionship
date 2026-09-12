@@ -97,6 +97,32 @@
     </svg>
     @break
 
+  @case('facebook')
+    <svg width="{{ $size }}" height="{{ $size }}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M14 8.5V6.8c0-.8.2-1.3 1.4-1.3H17V2.6c-.3 0-1.2-.1-2.2-.1-2.2 0-3.8 1.4-3.8 3.9v2.1H8.5V12H11v9h3v-9h2.5l.4-3.5z"/>
+    </svg>
+    @break
+
+  @case('twitter')
+    <svg width="{{ $size }}" height="{{ $size }}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.5 3h3.1l-6.8 7.8L21.8 21h-6.2l-4.9-6.4L5.1 21H2l7.3-8.3L2.3 3h6.4l4.4 5.8zm-1.1 16.1h1.7L7.7 4.8H5.9z"/>
+    </svg>
+    @break
+
+  @case('tiktok')
+    <svg width="{{ $size }}" height="{{ $size }}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M16.5 2h-3v13.1a2.6 2.6 0 1 1-2.1-2.6V9.4a5.7 5.7 0 1 0 5.1 5.7V9.3a6.8 6.8 0 0 0 4 1.3V7.5a3.9 3.9 0 0 1-4-3.9z"/>
+    </svg>
+    @break
+
+  {{-- Anything the CMS lists that this set has no mark for. --}}
+  @case('link')
+    <svg width="{{ $size }}" height="{{ $size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $stroke }}" aria-hidden="true">
+      <path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/>
+      <path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/>
+    </svg>
+    @break
+
   @case('menu')
     <svg width="{{ $size }}" height="{{ $size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $stroke }}" aria-hidden="true">
       <path d="M4 7h16M4 12h16M4 17h16"/>

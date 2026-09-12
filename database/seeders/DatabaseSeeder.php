@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         // The event tables are the only ones seeded here. The other 58 come
         // from cms-template-engine.sql, which the db container imports.
         $this->call(TournamentSeeder::class);
+        $this->call(SocialLinksSeeder::class);
     }
 }

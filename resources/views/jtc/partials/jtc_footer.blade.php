@@ -1,4 +1,9 @@
-@php $active = $active ?? ''; @endphp
+@php
+    $active  = $active ?? '';
+    // Shared by every page, so it is fetched here rather than threaded through
+    // five controller methods that otherwise have nothing to do with it.
+    $socials = \terre\Http\Models\SocialLinkModel::published();
+@endphp
 
 <footer class="jtc__footer">
   <div class="jtc__container">
@@ -17,12 +22,23 @@
         <a class="{{ $active === 'jtc_register' ? 'is-active' : '' }}" href="{{ route('jtc_register') }}">Register</a>
       </nav>
 
-      {{-- ponytail: real handles once they exist; these are the PSD's icons. --}}
-      <div class="jtc__social">
-        <a href="#" aria-label="Instagram">@include('jtc.partials.jtc_icon', ['name' => 'instagram', 'size' => 20])</a>
-        <a href="#" aria-label="YouTube">@include('jtc.partials.jtc_icon', ['name' => 'youtube', 'size' => 20])</a>
-        <a href="#" aria-label="LinkedIn">@include('jtc.partials.jtc_icon', ['name' => 'linkedin', 'size' => 18])</a>
-      </div>
+      {{-- Accounts from the CMS. A row with no link never reaches here, so
+           every icon goes somewhere; the module's FontAwesome class picks the
+           mark, and anything this set has no mark for falls back to a link. --}}
+      @if (count($socials))
+        <div class="jtc__social">
+          @foreach ($socials as $social)
+            <a href="{{ $social->link }}" target="_blank" rel="noopener me"
+               aria-label="{{ $social->name }}{{ $social->username ? ' — ' . $social->username : '' }}">
+              @include('jtc.partials.jtc_icon', [
+                  'name' => in_array($social->icon_slug, ['instagram','youtube','linkedin','facebook','twitter','tiktok'])
+                      ? $social->icon_slug : 'link',
+                  'size' => 20,
+              ])
+            </a>
+          @endforeach
+        </div>
+      @endif
     </div>
 
     <div class="jtc__footer-bottom">

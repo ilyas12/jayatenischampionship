@@ -62,6 +62,18 @@ check_contains "$BASE/"             'jtc__hero'          "home renders its hero"
 check_contains "$BASE/"             'jtc__quick-item'    "home renders the quick links band"
 check_contains "$BASE/" 'jtc__partners-row|jtc__partners-row' "home renders the partners row"
 check_contains "$BASE/" 'uploads/event_partners/' "partner logos come from the CMS, not the theme folder"
+# The footer's social icons are CMS rows. With no handle entered the block is
+# absent rather than linking nowhere, so either state is correct — what must
+# never happen is an icon pointing at "#".
+if curl -s --max-time 30 "$BASE/" | grep -q 'jtc__social'; then
+    if curl -s --max-time 30 "$BASE/" | grep -qE 'jtc__social.*href="#"'; then
+        bad "a footer social icon links to # instead of an account"
+    else
+        ok "footer social icons link to the accounts set in the CMS"
+    fi
+else
+    ok "footer omits social icons while no account has a handle"
+fi
 # The facts strip reads the event: its categories are the ones in the CMS, not
 # the three the mockup drew.
 check_contains "$BASE/" 'jtc__fact-list' "home lists the event's categories"
