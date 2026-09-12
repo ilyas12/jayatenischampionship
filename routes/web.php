@@ -148,6 +148,19 @@ $router->group([
     Route::get('/registration', array('as' => 'tennis_registration', 'uses' => 'Tennis@registration'));
 
     /**
+     * Jaya Tennis Championship 2026 theme, sliced from JTC_Desktop_Master_New.psd.
+     *
+     * Under /jtc while it runs alongside the current site — the two share four
+     * of their five paths, so they cannot both sit at the root. Moving this to
+     * the root is a matter of dropping the prefix once it replaces the old one.
+     */
+    Route::get('/jtc', array('as' => 'jtc_home', 'uses' => 'Jtc@home'));
+    Route::get('/jtc/past-winners', array('as' => 'jtc_past_winners', 'uses' => 'Jtc@pastWinners'));
+    Route::get('/jtc/schedule', array('as' => 'jtc_schedule', 'uses' => 'Jtc@schedule'));
+    Route::get('/jtc/draw', array('as' => 'jtc_draw', 'uses' => 'Jtc@draw'));
+    Route::get('/jtc/register', array('as' => 'jtc_register', 'uses' => 'Jtc@register'));
+
+    /**
      * Event registration — generic, keyed by event slug and registration code.
      */
     Route::post('/event/{slug}/register', array('as' => 'event_register', 'uses' => 'EventRegistration@store'));
