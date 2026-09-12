@@ -28,6 +28,22 @@ galleries, services. They are the template's inventory, not dead code; a module
 having no public page here is not a reason to remove it. Clean up the front-end;
 leave the admin alone.
 
+### What an admin can change
+
+Everything the public site shows, except brand copy. All of it is in the admin
+behind the obfuscated prefix.
+
+| Menu | Controls |
+| --- | --- |
+| Events → Manage Events | Title, venue, format, fee, dates, **phase** — the switch that publishes the draw and the champions |
+| Events → Registrations | Verify a payment; `paid` puts the club on the site |
+| Events → Teams, Team Players | Clubs, squads, photos, seeding |
+| Events → Schedule, Draw | Ties, courts, kick-off times, results |
+| Events → Categories, Partners | The draws on offer; the sponsor logos |
+| Pages | Privacy, terms, contact, rules, FAQ |
+| Global Configurations → Social Link | The footer's social accounts |
+| Global Configurations → Upload Logo | The admin's own logo |
+
 ---
 
 ## Table of contents
@@ -46,17 +62,39 @@ leave the admin alone.
 
 ## The tournament site
 
-Six public routes, all at the root, all in `app/Http/Controllers/Tennis.php`
-against `resources/views/tennis/`:
+Sliced from `JTC_Desktop_Master_New.psd` (five 1440px artboards) and served from
+the document root. Every page is `app/Http/Controllers/Jtc.php` against
+`resources/views/jtc/`, in a theme that carries its own stylesheet, script and
+assets and uses no CSS framework.
 
-| Route | Name | Shows |
+| Route | Name | Reads |
 | --- | --- | --- |
-| `/` | `tennis_home` | Hero counters, categories, featured teams — all derived from the current event |
-| `/teams` | `tennis_teams` | Clubs entered, filterable |
-| `/teams/{permalink}` | `tennis_team` | One club: squad with photos, record, ties |
-| `/draw` | `tennis_bracket` | Bracket per category, plus the results board |
-| `/schedule` | `tennis_schedule` | Order of play |
-| `/registration` | `tennis_registration` | Entry form |
+| `/` | `jtc_home` | Event dates, venue, categories, entry status, partners, last edition's totals |
+| `/past-winners` | `jtc_past_winners` | Champions, from the finals in `event_matches` |
+| `/schedule` | `jtc_schedule` | Order of play, from ties that have a `starts_at` |
+| `/draw` | `jtc_draw` | Bracket per category, from `event_matches` |
+| `/register` | `jtc_register` | Fee, format, categories, and the entry form |
+| `/{slug}` | `jtc_page` | An editorial page from the CMS — privacy, terms, contact, rules, FAQ |
+
+`/{slug}` is registered **last** and matches a single segment, so every named
+route above claims its own path first and an unpublished slug is a 404.
+
+### Everything on these pages comes from the CMS
+
+Nothing on the public site is hardcoded except brand copy — the hero campaign
+line and the "More Than A Tournament" block, which have no data behind them.
+
+| On the page | Comes from |
+| --- | --- |
+| Tournament dates | The days the ties are played (`event_matches.starts_at`) |
+| Venue, format, entry fee | `events.venue`, `.venue_detail`, `.format`, `.price` |
+| Categories | `event_categories` |
+| Entry status | The event's phase and its date window |
+| Schedule, draw, champions | `event_matches`, three readings of the same rows |
+| "In numbers" | Counted from the last edition whose results are public |
+| Partners | `event_partners`, per edition |
+| Footer social icons | The CMS's `social_link` module |
+| Footer legal links | Static pages flagged for the footer |
 
 ### Phases
 
@@ -64,26 +102,41 @@ An event moves through four phases, set by an admin on the event record. The
 phase decides what the public site will show; **no page ever disappears from the
 navigation**, it explains itself instead.
 
-| Phase | Entries | Draw | Results |
+| Phase | Entries | Draw | Champions |
 | --- | --- | --- | --- |
 | `registration` | open | hidden | hidden |
 | `draw` | closed | published | hidden |
-| `running` | closed | published | appear as ties are played |
-| `finished` | closed | published | complete, champion decided |
+| `running` | closed | published | as ties are decided |
+| `finished` | closed | published | complete |
 
 Entries also respect the event's own date window, so `registration` alone does
-not keep a closed event open.
+not keep a closed event open — and an event past that phase is closed whatever
+its dates say.
+
+Past winners is gated on the same rule as the draw. Without it the page crowned
+a champion from a bracket the draw page was still refusing to show, both reading
+the same rows.
+
+### Empty states, not empty pages
+
+A page whose data is not published yet says so. The draw explains the phase, the
+schedule says no ties are scheduled, past winners says no champion has been
+crowned. Tabs are built from data that exists, so no tab leads to an empty table.
+
+The one deliberate exception is the home page's "in numbers" band, which is
+absent rather than zeroed until an edition has been played: it is a boast in the
+middle of a page, not a destination somebody navigated to.
 
 ### Registration flow
 
 ```
-entrant submits /registration
+entrant submits the form
    └─ POST /event/{slug}/register        pending
       └─ payment instructions emailed, quoting a registration code
          └─ GET  /event/payment/{code}   entrant uploads proof
             └─ POST same route           awaiting_verification
                └─ admin verifies in the CMS
-                  └─ paid  ──▶ team appears on the public site
+                  └─ paid  ──▶ club appears on the public site
 ```
 
 Reaching `paid` creates the club and its squad automatically. Losing that status
@@ -91,12 +144,23 @@ unpublishes the team rather than deleting it, so an admin's later work — seed,
 group, photos — is never destroyed by a status change. Codes are random, not
 sequential, because the confirmation page is reachable by code alone.
 
+The 2026 design closes the public entry form, so nothing links to that first
+POST; the route behind it is still live, and the confirmation page is the one
+public page that writes to the database.
+
 ### Derived, not stored
 
-Team status, match winners, the champion and the hero counters are **computed
-from `event_matches` and the event record** on each request. There is no
-"champion" column to forget to update, and no way for a stored summary to
+Match winners, the champion, a club's record and the hero counters are
+**computed from `event_matches` and the event record** on each request. There is
+no "champion" column to forget to update, and no way for a stored summary to
 disagree with the ties it summarises.
+
+### The retired theme
+
+`old/` holds the front-end this one replaced — controller, views and assets. It
+is the only place the public pages were ever wired to the CMS in the older
+shape, so it is kept for reference; nothing routes to it and `.htaccess` denies
+the whole directory.
 
 ---
 
@@ -322,17 +386,57 @@ The dev `db` volume is seeded on first boot from three files, in order:
 | `docker/mysql/init/02-modernize-schema.sql` | MyISAM → InnoDB, utf8mb3 → utf8mb4 |
 | `docker/mysql/init/03-zero-dates.sql` | Zero dates → `NULL` |
 
-The seven `event*` tables are **not** in that dump — they postdate it, and are
-created by the only migrations this project owns:
+The `event*` tables are **not** in that dump — they postdate it, and are created
+by the migrations this project owns:
 
 ```bash
 docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
 ```
+
+| Migration | What it does |
+| --- | --- |
+| `create_event_*` | The eight event tables: events, registrations, teams, members, categories, schedule, matches, partners |
+| `add_starts_at_to_event_matches` | When a tie is played. `round` is a position in the draw, not a time |
+| `add_venue_to_events`, `add_format_to_events` | Where and how this edition is played |
+| `fix_missing_auto_increment`, `fix_static_page_auto_increment` | Repairs, see below |
 
 Beyond those, `database/migrations/` holds only the three stock Laravel tables
 (`users`, `password_resets`, `personal_access_tokens`). The other 58 tables are
 the dump's, and no migration reproduces them — do not expect a migration to
 build this schema from nothing.
+
+### Three tables lost their AUTO_INCREMENT
+
+`social_link`, `brand` and `static_page` came out of the dump with a primary key
+that does not auto-increment. It looks fine and behaves badly: through the app
+every insert fails with *Field 'id' doesn't have a default value*, so **Add
+Social Link, Add Brand and Add Page simply did not work**; through a connection
+without strict mode the insert succeeds and writes `id = 0`, and the next one
+collides with it. Two migrations restore it, starting each counter past the
+highest id present. Worth checking on any other database built from this dump.
+
+### Seeders
+
+```bash
+docker compose exec app php artisan db:seed                     # all of them
+docker compose exec app php artisan db:seed --class="Database\Seeders\PagesSeeder"
+```
+
+| Seeder | Writes |
+| --- | --- |
+| `TournamentSeeder` | One edition: 8 clubs and squads, 6 categories, a full bracket with results, 5 schedule days, 7 partner logos |
+| `SocialLinksSeeder` | Instagram, YouTube and LinkedIn, ready for a handle |
+| `PagesSeeder` | Privacy, terms, contact, rules and FAQ |
+
+All three are idempotent and none destroys editorial work: `PagesSeeder` skips
+any page whose text has been changed, `SocialLinksSeeder` keeps a handle someone
+entered, and `TournamentSeeder` rebuilds only its own event's rows.
+
+They also retire what the template shipped that does not belong on a tennis
+site — the money changer's currency page and the template author's own social
+accounts. **Unpublished, never deleted**, so one click in the admin brings any
+of them back.
 
 Both migration scripts are idempotent, so they can be applied by hand — this is
 also how you would prepare a production database:
@@ -382,13 +486,19 @@ strict regardless.
 ./scripts/smoke-test.sh
 ```
 
-53 checks against a running stack: the six tournament routes, the teams and draw
-pages against real data, an unknown team slug returning 404, the full
-registration round trip (which cleans up the registrations it creates), static
-assets, error handling, admin login and CSRF, twelve authenticated admin screens
-including every event module, the Imagine thumbnail and effects pipeline, the
-vhost deny rules, and a scan for PHP errors leaking into responses. Run it after
-any dependency or configuration change.
+73 checks against a running stack: every public route, a structural marker on
+each page so a template that renders empty is caught rather than passing on its
+status code, the five editorial pages and a 404 for a slug nobody published, the
+full registration round trip (which cleans up the registration it creates),
+theme assets, error handling, admin login and CSRF, twelve authenticated admin
+screens including every event module, the Imagine thumbnail and effects
+pipeline, the deny rules — including the archived theme under `old/` — and a
+scan for PHP errors leaking into responses. Run it after any dependency or
+configuration change.
+
+Checks that depend on event data accept either the data or the notice standing
+in for it, because both are correct: what they reject is a blank page, a tab
+leading to nothing, or a link still pointing at `#`.
 
 Point it at another environment by passing a base URL:
 
@@ -413,26 +523,31 @@ Two checks exist because of bugs that passed everything else:
 app/
   Admin/          Admin panel controllers, models, middleware
   Http/
-    Controllers/  Tennis.php, EventRegistration.php, Auth/
-    Models/       Event*Model — shared with the admin's event modules
+    Controllers/  Jtc.php, EventRegistration.php, Auth/
+    Models/       Event*Model, StaticPageModel, SocialLinkModel — shared
+                  with the admin's modules
   Libraries/      Local replacements for removed framework pieces
 config/
 database/
-  migrations/     The event tables only; the rest of the schema is the SQL dump
+  migrations/     The event tables and two repairs; the rest is the SQL dump
 docker/
   apache/         vhost, including the deny rules
   mysql/          my.cnf and the two schema migrations
   php/            php.ini (dev) and php.prod.ini
+database/
+  seeders/        Tournament, social links and pages
+old/              The retired front-end, denied over HTTP
 resources/
   admin/views/    Admin panel Blade templates
   assets/         CSS, JS, images and uploads — served publicly
-    tennis/       Tournament CSS, JS and imagery
+    jtc/          Theme CSS, JS and imagery
+    uploads/      What the admin writes: partner logos, team photos, proofs
   views/
-    tennis/       Tournament templates
+    jtc/          Theme templates, partials and the editorial page
     emails/       Payment instructions
     events/       Payment confirmation and proof upload
-routes/web.php    Admin routes sit behind the obfuscated prefix; the tournament
-                  is at the root
+routes/web.php    Admin behind the obfuscated prefix; the theme at the root,
+                  with the editorial-page catch-all registered last
 scripts/          smoke-test.sh, seed-test-admin.sh
 ```
 
@@ -447,11 +562,20 @@ host, where `index.php` sits at the root and views reference assets as
 `asset('resources/assets/...')`, which only resolves from there. `public/`
 contains only a stock `index.php` and is unused.
 
-Because the project root is served, `docker/apache/vhost.conf` explicitly denies
-HTTP access to `app/`, `bootstrap/`, `config/`, `database/`, `storage/`,
-`tests/`, `vendor/`, `resources/views/`, `resources/lang/`, dotfiles, `*.sql`
-and `*.log`. `resources/assets/` stays public, as the app requires. **Any host
-serving this project without equivalent rules exposes `.env`.**
+Because the project root is served, everything that exists on disk is a
+candidate for being served as a plain file. The rewrite only forwards a request
+to Laravel when the path does **not** exist, so a real file bypasses the
+framework entirely. `.htaccess` therefore denies `app/`, `bootstrap/`, `config/`,
+`database/`, `docker/`, `old/`, `scripts/`, `storage/`, `tests/`, `vendor/`,
+`resources/views/`, `resources/lang/`, dotfiles, and `*.sql *.log *.md *.json`
+and friends. `resources/assets/` stays public, as the app requires.
+
+**`.htaccess` is the only protection a cPanel host has.**
+`docker/apache/vhost.conf` carries the equivalent rules for the container and
+never ships anywhere. Before those rules existed, the live site served
+`cms-template-engine.sql` — the whole database, admin password hashes included —
+and `storage/logs/laravel.log`, whose stack traces carry credentials, to anyone
+who asked. The smoke suite asserts they are denied.
 
 Moving to a `public/` document root is the conventional fix, but it means
 relocating `resources/assets`, updating the 21 views that reference it — the
