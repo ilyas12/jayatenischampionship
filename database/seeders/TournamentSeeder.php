@@ -97,6 +97,7 @@ class TournamentSeeder extends Seeder
                             . 'and club team events — open to registered players of every grade.';
         $event->venue        = 'Jakarta';
         $event->venue_detail = 'Indonesia';
+        $event->format       = 'Doubles knockout';
         $event->price   = 750000;
         $event->payment_instructions =
               "Transfer the entry fee to:\n\n"

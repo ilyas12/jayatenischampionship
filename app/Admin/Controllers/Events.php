@@ -111,6 +111,12 @@ class Events extends ScaffoldController
                 'suffix' => 'Second line, e.g. <code>Indonesia</code>.',
             ],
             [
+                'name'   => 'format',
+                'label'  => 'Tournament Format',
+                'suffix' => 'How this edition is played, e.g. <code>Doubles knockout</code>. '
+                          . 'Shown on the register page; left empty it reads <code>TBA</code>.',
+            ],
+            [
                 'name'       => 'price',
                 'label'      => 'Price (IDR)',
                 'validation' => 'nullable|numeric',

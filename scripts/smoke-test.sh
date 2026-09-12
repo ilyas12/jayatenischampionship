@@ -106,6 +106,7 @@ check_contains "$BASE/" 'href="[^"]*privacy-policy"' "footer links to the pages 
 # The register page links to the rules and the FAQ, and never to "#".
 check_contains "$BASE/register" 'href="[^"]*rules-regulations"' "register links to the rules page"
 check_contains "$BASE/register" 'href="[^"]*faq"' "register links to the FAQ"
+check_contains "$BASE/register" 'Tournament Format' "register shows the tournament format from the event"
 if curl -s --max-time 30 "$BASE/register" | grep -qE 'jtc__info-value[^<]*<a[^>]*href="#"'; then
     bad "a tournament information link still points at #"
 else

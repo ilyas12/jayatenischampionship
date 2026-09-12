@@ -337,9 +337,11 @@ class Jtc extends \Illuminate\Routing\Controller
                     ? 'Rp ' . number_format($event->price, 0, ',', '.')
                     : 'TBA',
             ],
-            // No column on events describes the format, so this stays the
-            // design's placeholder until there is somewhere to write one.
-            ['icon' => 'people', 'label' => 'Tournament Format', 'value' => 'TBA'],
+            [
+                'icon'  => 'people',
+                'label' => 'Tournament Format',
+                'value' => $event && $event->format ? $event->format : 'TBA',
+            ],
             [
                 'icon'  => 'calendar',
                 'label' => 'Rules & Regulations',
