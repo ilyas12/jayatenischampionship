@@ -91,6 +91,8 @@ class TournamentSeeder extends Seeder
         $event->slug    = self::SLUG;
         $event->description = 'Eight days of championship tennis on grass. Singles, doubles '
                             . 'and club team events — open to registered players of every grade.';
+        $event->venue        = 'Jakarta';
+        $event->venue_detail = 'Indonesia';
         $event->price   = 750000;
         $event->payment_instructions =
               "Transfer the entry fee to:\n\n"

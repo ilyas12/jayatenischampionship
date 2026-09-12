@@ -9,7 +9,7 @@ class EventModel extends Model
     protected $table = 'events';
 
     protected $fillable = [
-        'title', 'slug', 'description', 'price',
+        'title', 'slug', 'description', 'venue', 'venue_detail', 'price',
         'payment_instructions', 'opens_at', 'closes_at', 'publish', 'phase',
     ];
 

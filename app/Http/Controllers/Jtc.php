@@ -34,6 +34,7 @@ class Jtc extends \Illuminate\Routing\Controller
             'active'     => 'jtc_home',
             'event'      => $event,
             'year'       => $event ? $this->editionYear($event) : date('Y'),
+            'venue'      => $event && $event->venue ? $event->venue : 'Jakarta',
             'facts'      => $this->facts($event),
             'lastEdition'=> $this->lastEdition(),
             'quickLinks' => [
@@ -312,9 +313,9 @@ class Jtc extends \Illuminate\Routing\Controller
     /**
      * The four-column strip shared by the home and register pages.
      *
-     * Dates, categories and the entry status come from the event. The venue
-     * does not: events have no venue column, so it stays the design's copy
-     * until there is somewhere to put it.
+     * Every column answers from the event now — dates from the days its ties
+     * are played, categories from event_categories, the venue from the event
+     * itself, and the last column from whether entries are open.
      */
     private function facts($event)
     {
@@ -328,7 +329,12 @@ class Jtc extends \Illuminate\Routing\Controller
                 'value' => $dates ? $this->dateRange($dates) : 'TBA',
                 'note'  => $event ? $this->editionYear($event) : date('Y'),
             ],
-            ['icon' => 'pin', 'label' => 'Venue', 'value' => 'Jakarta', 'note' => 'Indonesia'],
+            [
+                'icon'  => 'pin',
+                'label' => 'Venue',
+                'value' => $event && $event->venue ? $event->venue : 'TBA',
+                'note'  => $event ? $event->venue_detail : null,
+            ],
             [
                 'icon'  => 'people',
                 'label' => 'Categories',

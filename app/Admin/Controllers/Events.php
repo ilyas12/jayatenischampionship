@@ -60,6 +60,7 @@ class Events extends ScaffoldController
                 'sort'   => TRUE,
                 'prefix' => 'Rp ',
             ],
+            ['name' => 'venue', 'title' => 'Venue', 'sort' => TRUE],
             ['name' => 'phase', 'title' => 'Phase', 'sort' => TRUE],
             [
                 'name'  => 'opens_at',
@@ -97,6 +98,17 @@ class Events extends ScaffoldController
                 'name'  => 'description',
                 'label' => 'Description',
                 'type'  => 'tinymce',
+            ],
+            [
+                'name'   => 'venue',
+                'label'  => 'Venue',
+                'suffix' => 'First line of the venue on the site, e.g. '
+                          . '<code>Jakarta</code> or <code>Senayan Courts</code>.',
+            ],
+            [
+                'name'   => 'venue_detail',
+                'label'  => 'Venue Detail',
+                'suffix' => 'Second line, e.g. <code>Indonesia</code>.',
             ],
             [
                 'name'       => 'price',

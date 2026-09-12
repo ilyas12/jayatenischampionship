@@ -11,7 +11,7 @@
   <section class="jtc__hero"
            style="background-image: url('{{ \terre\Libraries\Asset::v('resources/assets/jtc/img/jtc_hero_home.jpg') }}')">
     <div class="jtc__container jtc__hero-inner">
-      <p class="jtc__hero-meta">Jakarta<br>{{ $year }}</p>
+      <p class="jtc__hero-meta">{{ $venue }}<br>{{ $year }}</p>
 
       <img class="jtc__hero-lockup"
            src="{{ \terre\Libraries\Asset::v('resources/assets/jtc/img/jtc_headline_lockup.png') }}"
