@@ -71,28 +71,90 @@ class Jtc extends \Illuminate\Routing\Controller
         ]);
     }
 
+    /**
+     * Champions by edition, read from the finals in event_matches.
+     *
+     * There is no past-winners table and no need for one: a champion is
+     * whoever won the last round of a category, which the draw already
+     * records. An edition only appears once it has produced one, so the year
+     * tabs are editions with a result rather than a fixed list of years.
+     */
     public function pastWinners()
     {
-        $winners = [
-            2025 => [
-                ['category' => "Men's Doubles",      'names' => 'Andreas / Michael',   'photo' => 'jtc_champion_1.jpg'],
-                ['category' => "Women's Doubles",    'names' => 'Cindy / Felicia',     'photo' => 'jtc_champion_2.jpg'],
-                ['category' => 'Mixed Doubles',      'names' => 'Raymond / Nathalie',  'photo' => 'jtc_champion_3.jpg'],
-                ['category' => 'Spirit of the Game', 'names' => 'Daniel Wirawan',      'photo' => 'jtc_champion_4.jpg'],
-            ],
-        ];
+        // Only editions whose results are public. A scored tie in an event
+        // still taking entries is an admin's working copy — the same reason
+        // the draw stays hidden until its phase — and crowning a champion from
+        // it here would contradict the draw page reading from the same rows.
+        $events = EventModel::where('publish', 1)->get()
+            ->filter(function ($event) { return $event->showsResults(); })
+            ->values();
 
-        // The PSD only dresses 2025. The other tabs are real years with no
-        // content yet rather than copies of 2025 pretending to be history.
-        foreach ([2024, 2023, 2022, 2021] as $year) {
-            $winners[$year] = [];
+        // Every decided tie across every edition in one query, rather than a
+        // pair of queries per year on a page that lists several.
+        $matches = $events->count()
+            ? EventMatchModel::with(['winner', 'category'])
+                ->whereIn('event_id', $events->pluck('id'))
+                ->where('publish', 1)
+                ->whereNotNull('winner_team_id')
+                ->get()
+            : collect();
+
+        $winners = [];
+
+        foreach ($events as $event) {
+            $ties = $matches->where('event_id', $event->id);
+
+            if ($ties->isEmpty()) {
+                continue;
+            }
+
+            $champions = [];
+
+            // One champion per category: the winner of its highest round.
+            foreach ($ties->groupBy('category_id') as $group) {
+                $final = $group->sortByDesc('round')->first();
+
+                if (! $final->winner) {
+                    continue;
+                }
+
+                $champions[] = [
+                    'category' => optional($final->category)->name ?: 'Champion',
+                    'names'    => $final->winner->name,
+                    'photo'    => $final->winner->photo_url ?: $final->winner->placeholder_photo_url,
+                ];
+            }
+
+            if ($champions) {
+                $winners[$this->editionYear($event, $ties)] = $champions;
+            }
         }
+
+        krsort($winners);
 
         return view('jtc.jtc_past_winners', [
             'active'  => 'jtc_past_winners',
-            'years'   => [2025, 2024, 2023, 2022, 2021],
+            'years'   => array_keys($winners),
             'winners' => $winners,
         ]);
+    }
+
+    /**
+     * The year an edition was played — which is not the year entries opened,
+     * and the events table stores no year of its own. The ties carry the real
+     * dates; the registration window is the fallback when none of them do.
+     */
+    private function editionYear($event, $ties)
+    {
+        $played = $ties->pluck('starts_at')->filter()->max();
+
+        if ($played) {
+            return (int) $played->format('Y');
+        }
+
+        $fallback = $event->closes_at ?: $event->created_at;
+
+        return $fallback ? (int) $fallback->format('Y') : (int) date('Y');
     }
 
     /**

@@ -61,8 +61,7 @@ check_contains() { # url pattern label
 check_contains "$BASE/"             'jtc__hero'          "home renders its hero"
 check_contains "$BASE/"             'jtc__quick-item'    "home renders the quick links band"
 check_contains "$BASE/"             'jtc__partners-row'  "home renders the partners row"
-check_contains "$BASE/past-winners" 'jtc__winner-grid'   "past winners renders the champion grid"
-check_contains "$BASE/past-winners" 'data-jtc-tabs="year"' "past winners renders its year tabs"
+check_contains "$BASE/past-winners" 'jtc__winner-grid|jtc__notice' "past winners renders champions or says there are none"
 # Schedule and draw read event_matches, so what they show depends on the data
 # and on the event phase: no bracket before the draw is made. Either the real
 # thing or the notice explaining its absence — never a blank page.
