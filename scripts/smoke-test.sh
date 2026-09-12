@@ -63,10 +63,22 @@ check_contains "$BASE/"             'jtc__quick-item'    "home renders the quick
 check_contains "$BASE/"             'jtc__partners-row'  "home renders the partners row"
 check_contains "$BASE/past-winners" 'jtc__winner-grid'   "past winners renders the champion grid"
 check_contains "$BASE/past-winners" 'data-jtc-tabs="year"' "past winners renders its year tabs"
-check_contains "$BASE/schedule"     'jtc__table'         "schedule renders its table"
-check_contains "$BASE/schedule"     'data-jtc-row="match"' "schedule rows carry their filter keys"
-check_contains "$BASE/draw"         'jtc__bracket'       "draw renders the bracket"
-check_contains "$BASE/draw"         'jtc__slot--champion' "draw renders the champion slot"
+# Schedule and draw read event_matches, so what they show depends on the data
+# and on the event phase: no bracket before the draw is made. Either the real
+# thing or the notice explaining its absence — never a blank page.
+check_contains "$BASE/schedule" 'jtc__table|jtc__notice'   "schedule renders ties or says none are scheduled"
+check_contains "$BASE/draw"     'jtc__bracket|jtc__notice' "draw renders the bracket or explains the phase"
+
+if curl -s --max-time 30 "$BASE/schedule" | grep -q 'data-jtc-row="match"'; then
+    ok "schedule rows come from the CMS and carry their filter keys"
+    if curl -s --max-time 30 "$BASE/schedule" | grep -qE '<td>[0-9]{2}:[0-9]{2}</td>'; then
+        ok "schedule prints a kick-off time per tie"
+    else
+        bad "schedule rows have no time — is starts_at set on the matches?"
+    fi
+else
+    printf '  \033[33mSKIP\033[0m  schedule rows — no tie has a starts_at yet\n'
+fi
 check_contains "$BASE/register"     'jtc__form-panel'    "register renders the entry form"
 check_contains "$BASE/register"     'jtc__category-grid' "register renders the category choices"
 

@@ -2,14 +2,20 @@
 
 namespace terre\Http\Controllers;
 
+use terre\Http\Models\EventCategoryModel;
+use terre\Http\Models\EventMatchModel;
+use terre\Http\Models\EventModel;
+
 /**
  * Jaya Tennis Championship — 2026 theme.
  *
- * A slice of JTC_Desktop_Master_New.psd, one method per artboard. The copy and
- * the sample rows are the PSD's own, held here as arrays rather than written
- * into the templates: the markup then loops over data, so wiring a section to
- * the CMS later is a matter of swapping an array for a query without touching
- * the Blade.
+ * A slice of JTC_Desktop_Master_New.psd, one method per artboard.
+ *
+ * The schedule and the draw read the CMS: both come out of event_matches, and
+ * what they show follows the event's phase. The home page and past winners
+ * are still the PSD's copy, held as arrays here rather than written into the
+ * templates — the markup loops over data either way, so wiring the rest is a
+ * matter of swapping an array for a query without touching the Blade.
  *
  * Deliberately not extending the CMS's base Controller. That constructor loads
  * site configuration and static content this theme does not read, and every
@@ -89,41 +95,126 @@ class Jtc extends \Illuminate\Routing\Controller
         ]);
     }
 
+    /**
+     * The order of play, read from event_matches.
+     *
+     * A tie appears once it has a time on it. The day tabs are the days that
+     * actually have ties, so there are no tabs leading to an empty table, and
+     * the category filter is the event's own categories rather than a fixed
+     * list of three.
+     */
     public function schedule()
     {
+        $event = EventModel::current();
+
+        $matches = $event
+            ? EventMatchModel::with(['home', 'away', 'category'])
+                ->where('event_id', $event->id)->where('publish', 1)
+                ->scheduled()->get()
+            : collect();
+
+        $days = $matches->groupBy('day_key')->keys()->values()
+            ->map(function ($day, $i) {
+                return [
+                    'key'   => $day,
+                    'label' => 'Day ' . ($i + 1),
+                    'date'  => \Carbon\Carbon::parse($day)->format('D, j M'),
+                ];
+            })->all();
+
         return view('jtc.jtc_schedule', [
-            'active' => 'jtc_schedule',
-            'days' => [
-                ['key' => 'd1', 'label' => 'Day 1', 'date' => 'Mon, 12 Oct'],
-                ['key' => 'd2', 'label' => 'Day 2', 'date' => 'Tue, 13 Oct'],
-                ['key' => 'd3', 'label' => 'Day 3', 'date' => 'Wed, 14 Oct'],
-                ['key' => 'd4', 'label' => 'Day 4', 'date' => 'Thu, 15 Oct'],
-                ['key' => 'd5', 'label' => 'Day 5', 'date' => 'Fri, 16 Oct'],
-                ['key' => 'd6', 'label' => 'Day 6', 'date' => 'Sat, 17 Oct'],
-                ['key' => 'd7', 'label' => 'Day 7', 'date' => 'Sun, 18 Oct'],
-            ],
-            'categories' => ["Men's Doubles", "Women's Doubles", 'Mixed Doubles'],
-            'matches' => [
-                ['day' => 'd1', 'time' => '08:00', 'court' => '1', 'category' => "Men's Doubles",   'round' => 'Round 1',      'home' => 'R. Santoso / A. Pratama',  'away' => 'D. Wijaya / H. Kurniawan', 'status' => 'Completed'],
-                ['day' => 'd1', 'time' => '09:30', 'court' => '1', 'category' => "Women's Doubles", 'round' => 'Round 1',      'home' => 'C. Angelina / F. Lestari', 'away' => 'M. Hartono / S. Dewi',     'status' => 'Completed'],
-                ['day' => 'd1', 'time' => '11:00', 'court' => '2', 'category' => 'Mixed Doubles',   'round' => 'Round 1',      'home' => 'B. Gunawan / N. Putri',    'away' => 'T. Wijaya / R. Sari',      'status' => 'Completed'],
-                ['day' => 'd2', 'time' => '13:00', 'court' => '1', 'category' => "Men's Doubles",   'round' => 'Round 2',      'home' => 'A. Salim / R. Hartono',    'away' => 'Y. Prabowo / D. Susanto',  'status' => 'Upcoming'],
-                ['day' => 'd2', 'time' => '14:30', 'court' => '2', 'category' => "Women's Doubles", 'round' => 'Quarter Final','home' => 'K. Natalia / V. Lim',      'away' => 'J. Gunadi / P. Tan',       'status' => 'Upcoming'],
-                ['day' => 'd2', 'time' => '16:00', 'court' => '1', 'category' => 'Mixed Doubles',   'round' => 'Quarter Final','home' => 'D. Santoso / L. Chen',     'away' => 'A. Wijaya / M. Kusuma',    'status' => 'Upcoming'],
-            ],
+            'active'     => 'jtc_schedule',
+            'event'      => $event,
+            'days'       => $days,
+            'categories' => $matches->pluck('category.name')->filter()->unique()->values()->all(),
+            'matches'    => $matches->map(function ($match) {
+                return [
+                    'day'      => $match->day_key,
+                    'time'     => $match->time_label,
+                    'court'    => $match->court,
+                    'category' => optional($match->category)->name ?: '—',
+                    'round'    => $match->round_name ?: $match->label,
+                    'home'     => $match->sideName('home'),
+                    'away'     => $match->sideName('away'),
+                    'status'   => $match->status_label,
+                ];
+            })->all(),
         ]);
     }
 
+    /**
+     * The bracket, one tab per category, read from event_matches.
+     *
+     * Hidden until the event reaches the draw phase: a bracket sitting in the
+     * database before then is an admin's working copy, not something to
+     * publish. The page stays reachable and says so.
+     */
     public function draw()
     {
+        $event = EventModel::current();
+
+        $matches = ($event && $event->showsDraw())
+            ? EventMatchModel::with(['home', 'away', 'winner', 'category'])
+                ->where('event_id', $event->id)->where('publish', 1)
+                ->orderBy('round')->orderBy('order_id')->orderBy('id')->get()
+            : collect();
+
+        $draws = [];
+
+        foreach (EventCategoryModel::forEvent($event) as $category) {
+            $ties = $matches->where('category_id', $category->id);
+
+            if ($ties->count()) {
+                $draws[$category->code ?: 'c' . $category->id] = [
+                    'name'   => $category->name,
+                    'rounds' => $this->rounds($ties),
+                ];
+            }
+        }
+
+        // Ties an admin has not filed under a category still belong somewhere.
+        $loose = $matches->whereNull('category_id');
+
+        if ($loose->count()) {
+            $draws['all'] = ['name' => 'All ties', 'rounds' => $this->rounds($loose)];
+        }
+
         return view('jtc.jtc_draw', [
             'active' => 'jtc_draw',
-            'draws'  => [
-                'md' => ['name' => "Men's Doubles",   'rounds' => $this->bracket()],
-                'wd' => ['name' => "Women's Doubles", 'rounds' => $this->bracket(true)],
-                'xd' => ['name' => 'Mixed Doubles',   'rounds' => $this->bracket(true)],
-            ],
+            'event'  => $event,
+            'draws'  => $draws,
         ]);
+    }
+
+    /**
+     * Group one category's ties into the columns the bracket draws, and append
+     * the champion column the design ends on.
+     */
+    private function rounds($ties)
+    {
+        $rounds = $ties->groupBy('round')->map(function ($group) {
+            $first = $group->first();
+
+            return [
+                'title'    => $first->round_name ?: 'Round ' . $first->round,
+                'linked'   => true,
+                'matchups' => $group->map(function ($match) {
+                    return [$match->sideName('home'), $match->sideName('away')];
+                })->values()->all(),
+            ];
+        })->values()->all();
+
+        // The final's winner, if it has one. Nothing is stored as "champion";
+        // it is whoever won the last round that has been played.
+        $final    = $ties->sortByDesc('round')->first();
+        $champion = $final && $final->winner ? $final->winner->name : null;
+
+        $rounds[] = [
+            'title'    => 'Champion',
+            'matchups' => [[$champion ?: 'CHAMPION', null]],
+        ];
+
+        return $rounds;
     }
 
     public function register()
@@ -162,33 +253,4 @@ class Jtc extends \Illuminate\Routing\Controller
         ];
     }
 
-    /**
-     * An eight-pair bracket: the first round named, everything after it an
-     * empty slot waiting on a result. `linked` draws the connector to the
-     * right of a column.
-     *
-     * @param bool $blank  Categories the PSD leaves undrawn show the same
-     *                     structure with no names in it.
-     */
-    private function bracket($blank = false)
-    {
-        $round1 = [
-            ['R. Santoso / A. Pratama', 'D. Wijaya / H. Kurniawan'],
-            ['A. Salim / R. Hartono',   'Y. Prabowo / D. Susanto'],
-            ['B. Gunawan / T. Wijaya',  'M. Indra / S. Liem'],
-            ['H. Kurnia / F. Fernando', 'D. Santoso / L. Chen'],
-        ];
-
-        if ($blank) {
-            $round1 = array_fill(0, 4, [null, null]);
-        }
-
-        return [
-            ['title' => 'Round 1',       'linked' => true, 'matchups' => $round1],
-            ['title' => 'Quarter Final', 'linked' => true, 'matchups' => array_fill(0, 4, [null, null])],
-            ['title' => 'Semi Final',    'linked' => true, 'matchups' => array_fill(0, 2, [null, null])],
-            ['title' => 'Final',         'linked' => true, 'matchups' => [[null, null]]],
-            ['title' => 'Champion',      'matchups' => [['CHAMPION', null]]],
-        ];
-    }
 }

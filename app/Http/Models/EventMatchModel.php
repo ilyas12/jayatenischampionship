@@ -9,12 +9,51 @@ class EventMatchModel extends Model
     protected $table = 'event_matches';
 
     protected $fillable = [
-        'event_id', 'category_id', 'round', 'round_name', 'label', 'meta', 'court',
+        'event_id', 'category_id', 'round', 'round_name', 'label', 'starts_at', 'meta', 'court',
         'home_team_id', 'away_team_id', 'home_score', 'away_score',
         'winner_team_id', 'order_id', 'publish',
     ];
 
-    protected $casts = ['publish' => 'boolean'];
+    protected $casts = [
+        'publish'   => 'boolean',
+        'starts_at' => 'datetime',
+    ];
+
+    /** Ties with a time on them, in playing order — the schedule's rows. */
+    public function scopeScheduled($query)
+    {
+        return $query->whereNotNull('starts_at')->orderBy('starts_at');
+    }
+
+    /** "08:00". Blank when the tie has not been given a time. */
+    public function getTimeLabelAttribute()
+    {
+        return $this->starts_at ? $this->starts_at->format('H:i') : '';
+    }
+
+    /** The day tab this tie belongs under: its date, or null. */
+    public function getDayKeyAttribute()
+    {
+        return $this->starts_at ? $this->starts_at->format('Y-m-d') : null;
+    }
+
+    /**
+     * Derived, never stored: a tie with a winner has been played. Anything
+     * else is still to come, so there is no status column to fall out of step
+     * with the result written beside it.
+     */
+    public function getStatusLabelAttribute()
+    {
+        return $this->winner_team_id ? 'Completed' : 'Upcoming';
+    }
+
+    /** One side's name for the schedule table, or the placeholder. */
+    public function sideName($which)
+    {
+        $team = $which === 'home' ? $this->home : $this->away;
+
+        return $team ? $team->name : 'To be decided';
+    }
 
     public function event()    { return $this->belongsTo(EventModel::class, 'event_id'); }
     public function category() { return $this->belongsTo(EventCategoryModel::class, 'category_id'); }

@@ -24,7 +24,7 @@ use terre\Http\Models\EventTeamModel;
  *     php artisan db:seed --class=TournamentSeeder
  *
  * The clubs use the eight short codes that have crest artwork in
- * resources/assets/tennis/img/teams/ — the names are placeholders and are meant
+ * resources/assets/jtc/img/teams/ — the names are placeholders and are meant
  * to be corrected in the admin.
  */
 class TournamentSeeder extends Seeder
@@ -199,10 +199,10 @@ class TournamentSeeder extends Seeder
     private function draw($event, $category, $teams)
     {
         $qf = [
-            ['src', 'bbl', '6 6', '3 4', 'src', 'Centre Court'],
-            ['sbs', 'mas', '7 6', '5 2', 'sbs', 'Court 1'],
-            ['bts', 'mkn', '6 4 6', '2 6 3', 'bts', 'Court 2'],
-            ['kcc', 'ykv', '6 6', '4 1', 'kcc', 'Centre Court'],
+            ['src', 'bbl', '6 6', '3 4', 'src', 'Centre Court', '2026-10-16 08:00'],
+            ['sbs', 'mas', '7 6', '5 2', 'sbs', 'Court 1',      '2026-10-16 09:30'],
+            ['bts', 'mkn', '6 4 6', '2 6 3', 'bts', 'Court 2',  '2026-10-16 11:00'],
+            ['kcc', 'ykv', '6 6', '4 1', 'kcc', 'Centre Court', '2026-10-16 13:00'],
         ];
 
         $order = 0;
@@ -212,8 +212,8 @@ class TournamentSeeder extends Seeder
         }
 
         $sf = [
-            ['src', 'sbs', '6 7', '4 6', 'src', 'Centre Court'],
-            ['bts', 'kcc', '4 6 6', '6 3 4', 'kcc', 'Centre Court'],
+            ['src', 'sbs', '6 7', '4 6', 'src', 'Centre Court',     '2026-10-18 14:00'],
+            ['bts', 'kcc', '4 6 6', '6 3 4', 'kcc', 'Centre Court', '2026-10-18 16:00'],
         ];
 
         $order = 0;
@@ -223,12 +223,12 @@ class TournamentSeeder extends Seeder
         }
 
         $this->tie($event, $category, 3, 'Final', 'Final', $teams,
-                   ['src', 'kcc', '6 3 7', '4 6 5', 'src', 'Centre Court'], 0);
+                   ['src', 'kcc', '6 3 7', '4 6 5', 'src', 'Centre Court', '2026-10-19 15:00'], 0);
     }
 
     private function tie($event, $category, $round, $roundName, $label, $teams, $tie, $order)
     {
-        list($home, $away, $homeScore, $awayScore, $winner, $court) = $tie;
+        list($home, $away, $homeScore, $awayScore, $winner, $court, $startsAt) = $tie;
 
         EventMatchModel::create([
             'event_id'       => $event->id,
@@ -237,6 +237,7 @@ class TournamentSeeder extends Seeder
             'round_name'     => $roundName,
             'label'          => $label,
             'court'          => $court,
+            'starts_at'      => $startsAt,
             'home_team_id'   => $teams[$home]->id,
             'away_team_id'   => $teams[$away]->id,
             'home_score'     => $homeScore,

@@ -83,6 +83,7 @@ class EventMatches extends ScaffoldController
             ['name' => 'round', 'title' => 'Round', 'sort' => TRUE],
             ['name' => 'round_name', 'title' => 'Name', 'sort' => TRUE],
             ['name' => 'label', 'title' => 'Match'],
+            ['name' => 'starts_at', 'title' => 'Starts', 'sort' => TRUE],
             [
                 'name'       => 'home_team_id',
                 'title'      => 'Home',
@@ -131,6 +132,17 @@ class EventMatches extends ScaffoldController
                 'suffix' => 'Heading above the column, e.g. <code>Quarter-finals</code>.',
             ],
             ['name' => 'label', 'label' => 'Match Label', 'suffix' => 'e.g. <code>QF 1</code>.'],
+            [
+                'name'       => 'starts_at',
+                'label'      => 'Starts At',
+                'validation' => 'nullable|date',
+                // Plain text rather than a picker: the scaffold has a
+                // datepicker but no datetime one, and a date without a time is
+                // no use to a schedule listing ties at 08:00 and 09:30.
+                'suffix'     => 'Day and time this tie is played, as '
+                              . '<code>2026-10-12 08:00</code>. Fills the schedule page; '
+                              . 'leave empty for a tie that is not scheduled yet.',
+            ],
             ['name' => 'meta', 'label' => 'When / Where', 'suffix' => 'Shown on the draw, e.g. <code>Fri &middot; Centre</code>.'],
             ['name' => 'court', 'label' => 'Court', 'suffix' => 'Court column on the results board, e.g. <code>Centre</code>.'],
             [
